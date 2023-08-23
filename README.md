@@ -11,6 +11,12 @@ An easy application to check in employees at a kiosk area and validate attendanc
     * React
     * Node
 * Models
+    * QRCode
+        * **currentCode** - String (Hash and Salted)
+        * **expiryTime** - Date
+        * **group** - group _id
+        * **controllingAdmin** - UserAccount ID 
+        * **_id** - Mongo generated string
     * User
         * **username** - String *Unique*
         * **password** - String (Hash and Salted)
@@ -30,10 +36,19 @@ An easy application to check in employees at a kiosk area and validate attendanc
         * **adminOf** - Array[groupNames]
         * **_id** - Mongo generated string
     * Schedules
-        * **user** - user _id
+        * **user** - UserAccount _id
         * **group** - group _id
         * **assignedClockIn** - Date
         * **assignedClockOut** - Date
         * **userPunchIn** - Date
         * **userPunchOut** - Date
+        * **_id** - Mongo generated string
+##Routes
+|Path | Suffix | Type | Description | Headers | 
+| ----------- | ----------- | ----------- | ----------- |  ----------- |
+| /user | /signup | POST | User Sign Up | N/A |
+| /user | /login | POST | Sign In - Send Web Token | N/A
+| /user | /update | POST | Update Password & Email |  ExpiryToken |
+| /user | /logout | POST | Clears Web Token |  ----------- |
+ 
         
