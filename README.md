@@ -12,7 +12,6 @@ An easy application to check in employees at a kiosk area and validate attendanc
     * Node
 * Models
     * QRCode
-        * **currentCode** - String (Hash and Salted)
         * **expiryTime** - Date
         * **group** - group _id
         * **controllingAdmin** - UserAccount ID 
@@ -38,7 +37,7 @@ An easy application to check in employees at a kiosk area and validate attendanc
     * Schedules
         * **user** - UserAccount _id
         * **group** - group _id
-        * **assignedClockIn** - Date
+        * **assignedClockIn** - Array[Date, QRAdmin ]
         * **assignedClockOut** - Date
         * **userPunchIn** - Date
         * **userPunchOut** - Date
@@ -49,6 +48,9 @@ An easy application to check in employees at a kiosk area and validate attendanc
 | /user | /signup | POST | User Sign Up | N/A |
 | /user | /login | POST | Sign In - Send Web Token | N/A
 | /user | /update | POST | Update Password & Email |  ExpiryToken |
-| /user | /logout | POST | Clears Web Token |  ----------- |
+| /user | /logout | POST | Clears Web Token |   |
+|  |  |  |  |  |
+| /qrcode | /create | POST | New QR Validation Created | User Token of Group Admin  |
+| /qrcode | /generate | POST | Random string provided for QR |  User Token of Group Admin|
  
         
