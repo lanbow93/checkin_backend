@@ -28,9 +28,17 @@ export interface IGroup {
 
 
 export interface Schedule {
-    
+    user: string,
+    group: string,
+    assignedClockIn: Array<Date>,
+    assignedClockOut: Array<Date>,
+    userPunchIn: Array<[currentDate: Date, QRBadgeName: string ]>,
+    userPunchOut: Array<[currentDate: Date, QRBadgeName: string ]>,
 }
 
 export interface IQRCode {
-
+    accessCode: string,
+    expiryTime: Date,
+    group: string,
+    controllingAdmin: string,
 }
