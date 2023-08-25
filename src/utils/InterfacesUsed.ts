@@ -26,7 +26,6 @@ export interface IGroup {
     members: Array<string>,
 }
 
-
 export interface ISchedule {
     user: string,
     group: string,

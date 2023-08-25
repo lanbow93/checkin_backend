@@ -8,6 +8,7 @@ const express = require("express");
 dotenv.config();
 // Router imports
 const auth_1 = require("./controllers/auth");
+const group_1 = require("./controllers/group");
 // Create application object
 const app = express();
 // Middleware
@@ -19,9 +20,10 @@ app.use(cookieParser());
 app.use(morgan("tiny"));
 // Routes
 app.use("/auth", auth_1.default);
+app.use("/group", group_1.default);
 app.get("/", (request, response) => {
     console.log(request.body);
-    response.json({ "status": "server is functional" });
+    response.status(200).json({ page: "Home", status: "server is functional" });
 });
 // App listener
 const PORT = parseInt(process.env.PORT || "") || 7777;
