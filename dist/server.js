@@ -10,6 +10,7 @@ dotenv.config();
 const auth_1 = require("./controllers/auth");
 const group_1 = require("./controllers/group");
 const qrCode_1 = require("./controllers/qrCode");
+const schedule_1 = require("./controllers/schedule");
 // Create application object
 const app = express();
 // Middleware
@@ -23,6 +24,7 @@ app.use(morgan("tiny"));
 app.use("/auth", auth_1.default);
 app.use("/group", group_1.default);
 app.use("/qrcode", qrCode_1.default);
+app.use("/schedule", schedule_1.default);
 app.get("/", (request, response) => {
     console.log(request.body);
     response.status(200).json({ page: "Home", status: "server is functional" });
