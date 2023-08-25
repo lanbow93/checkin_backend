@@ -8,7 +8,7 @@ router.get("/", async(request: express.Request, response: express.Response) => {
     console.log({groupDate})
     console.log(request.body)
     response.status(200).json({
-        page: "GroupRouter", 
+        page: "GroupRouter",
         status: "Successfully Reached"
     })
 })

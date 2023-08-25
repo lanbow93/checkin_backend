@@ -9,6 +9,7 @@ dotenv.config()
 // Router imports
 import authRouter from "./controllers/auth"
 import groupRouter from "./controllers/group"
+import qrRouter from "./controllers/qrCode"
 
 // Create application object
 const app: Application = express();
@@ -26,6 +27,7 @@ app.use(morgan("tiny"))
 // Routes
 app.use("/auth", authRouter)
 app.use("/group", groupRouter)
+app.use("/qrcode", qrRouter)
 
 app.get("/", (request: Request, response: Response) => {
     console.log(request.body)
