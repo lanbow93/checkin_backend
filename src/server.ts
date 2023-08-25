@@ -3,11 +3,11 @@ import * as dotenv from "dotenv"
 import * as cors from "cors"
 import * as cookieParser from "cookie-parser";
 import * as morgan from "morgan"
-
-
+import * as express from "express"
 dotenv.config()
 
-const express = require("express")
+// Router imports
+import authRouter from "./controllers/auth"
 
 // Create application object
 const app: Application = express();
@@ -23,9 +23,10 @@ app.use(cookieParser())
 app.use(morgan("tiny"))
 
 // Routes
+app.use("/auth", authRouter)
 
 app.get("/", (request: Request, response: Response) => {
-    console.log(request)
+    console.log(request.body)
     response.json({"status": "server is functional"})
 })
 
