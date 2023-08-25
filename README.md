@@ -53,34 +53,34 @@ An easy application to check in employees at a kiosk area and validate attendanc
 |Path | Suffix | Type | Description | Headers | 
 | ----------- | ----------- | ----------- | ----------- |  ----------- |
 |  |  |  |  |  |
-| /user | /signup | POST | User Sign Up | N/A |
-| /user | /login | POST | Sign In <sub>(SendsWebToken)</sub> | N/A |
-| /user | /forgotpassword/:id | PUT | Update Password <sub>(forgotten)</sub> |  expiryToken |
-| /user | /emailupdate/:id | PUT | Update Email | userToken <sub>(IncludePassword)</sub> |
-| /user | /passwordupdate/:id | PUT | Update Password <sub>(UserPrompted)</sub> | userToken <sub>(IncludePassword)</sub> |
+| /user | /signup | POST | User Sign Up <sub>(/useraccount/create)</sub> | N/A |
+| /user | /login | POST | Sign In <sub>(Sends Web Token)</sub> | N/A |
+| /user | /forgotpassword/:id | PUT | Update Password <sub>(Forgotten)</sub> |  expiryToken |
+| /user | /emailupdate/:id | PUT | Update Email | userToken <sub>(Include Password)</sub> |
+| /user | /passwordupdate/:id | PUT | Update Password <sub>(User Prompted)</sub> | userToken <sub>(IncludePassword)</sub> |
 | /user | /logout | POST | Clears Web Token | N/A  |
 | /user | /delete/:id | POST | Delete User Account | userToken <sub>(isSiteAdmin)</sub> |
 |  |  |  |  |  |
-| /qrcode | /create | POST | New QR Validation Created | userToken <sub>(AdminOfGroup)</sub>  |
-| /qrcode | /generate/:id | GET | Random string provided for QR <sub>(/qrcode/update/:id)</sub> |  userToken <sub>(AdminOfGroup)</sub>|
-| /qrcode | /update/:id | PUT | Updates String && Expiry Time  <sub>(InternalRequest)</sub>|  userToken <sub>(SpecificOwner)</sub> |
+| /qrcode | /new | POST | New QR Validation Created | userToken <sub>(Admin Of Group)</sub>  |
+| /qrcode | /generate/:id | GET | Random string provided for QR <sub>(/qrcode/update/:id)</sub> |  userToken <sub>(Admin Of Group)</sub>|
+| /qrcode | /update/:id | PUT | Updates String && Expiry Time  <sub>(Internal Request)</sub>|  userToken <sub>(Specific Owner)</sub> |
 | /qrcode | /verify | POST | Checks accessCode <sub>(/schedule/statusverified)</sub> |  userToken |
-| /qrcode | /delete/:id | DELETE | Deletes QR document  |  userToken <sub>(SpecificOwner)</sub> |
+| /qrcode | /delete/:id | DELETE | Deletes QR document  |  userToken <sub>(Specific Owner)</sub> |
 |  |  |  |  |  |
 | /group | /view | GET |  View Group Details |  userToken <sub>(isGroupAdmin)</sub> |
-| /group | /create | POST |  Creates New Group  |  userToken <sub>(isGroupAdmin)</sub> |
+| /group | /new | POST |  Creates New Group  |  userToken <sub>(isGroupAdmin)</sub> |
 | /group | /editmembers | PUT | Add/Remove Member To Group <sub>(/useraccount/{ADD-DELETE}/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
 | /group | /editadmins | PUT | Add/Remove Member To Admin Group <sub>(/useraccount/{ADD-DELETE}admin/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
 | /group | /delete/:id | DELETE | Deletes group |  userToken <sub>(isGroupAdmin)</sub> |
 |  |  |  |  |  |
-| /useraccount | /new | POST | Creates a new user |  N/A |
-| /useraccount | /edit/:id | GET | Sends Info To Update <sub>(UserRequest)</sub> |  userToken |
-| /useraccount | /updatedetails/:id | PUT | Update Account Details <sub>(UserRequest)</sub> |  userToken |
-| /useraccount | /task/:id | PUT | Update Task |  userToken <sub>{AdminOfGroup}</sub> |
-| /useraccount | /addgroup/:id | PUT | Add User To Group <sub>(InternalRequest)</sub> | N/A |
-| /useraccount | /removegroup/:id | PUT | Remove User From Group <sub>(InternalRequest)</sub> | N/A |
-| /useraccount | /addgroupadmin/:id | PUT | Add User To Admin Group <sub>(InternalRequest)</sub> | N/A |
-| /useraccount | /removegroupadmin/:id | PUT | Remove User From Admin Group <sub>(InternalRequest)</sub> | N/A |
+| /useraccount | /new | POST | Creates a new user <sub>(Internal Request)</sub> |  N/A |
+| /useraccount | /edit/:id | GET | Sends Info To Update <sub>(User Request)</sub> |  userToken |
+| /useraccount | /updatedetails/:id | PUT | Update Account Details <sub>(User Request)</sub> |  userToken |
+| /useraccount | /task/:id | PUT | Update Task |  userToken <sub>{Admin Of Group}</sub> |
+| /useraccount | /addgroup/:id | PUT | Add User To Group <sub>(Internal Request)</sub> | N/A |
+| /useraccount | /removegroup/:id | PUT | Remove User From Group <sub>(Internal Request)</sub> | N/A |
+| /useraccount | /addgroupadmin/:id | PUT | Add User To Admin Group <sub>(Internal Request)</sub> | N/A |
+| /useraccount | /removegroupadmin/:id | PUT | Remove User From Admin Group <sub>(Internal Request)</sub> | N/A |
 |  |  |  |  |  |
 | /schedule | /new | POST | Creates Blank Schedule For User <sub>(InternalRequest)</sub> |  N/A |
 | /schedule | /addschedule | PUT | Adds New Dates To Schedule |  userToken <sub>(AdminOfGroup)</sub> |
