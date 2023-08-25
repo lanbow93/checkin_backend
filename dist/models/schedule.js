@@ -9,7 +9,7 @@ const scheduleSchema = new Schema({
     assignedClockOut: [Date],
     userPunchIn: [[Date, String]],
     userPunchOut: [[Date, String]]
-});
+}, { timestamps: true });
 const Schedule = model("Schedule", scheduleSchema);
 exports.default = Schedule;
 //# sourceMappingURL=schedule.js.map

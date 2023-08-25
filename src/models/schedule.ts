@@ -10,7 +10,7 @@ const scheduleSchema = new Schema<ISchedule>({
     assignedClockOut: [Date],
     userPunchIn: [[Date, String]],
     userPunchOut: [[Date, String]]
-})
+}, {timestamps: true})
 
 const Schedule = model("Schedule", scheduleSchema)
 
