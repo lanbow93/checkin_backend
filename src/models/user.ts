@@ -9,7 +9,7 @@ const userSchema = new Schema<IUser>({
     email: String,
     resetToken: String,
     resetTokenExpiry: Date
-})
+}, {timestamps: true})
 
 const User = model("User", userSchema)
 

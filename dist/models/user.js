@@ -8,7 +8,7 @@ const userSchema = new Schema({
     email: String,
     resetToken: String,
     resetTokenExpiry: Date
-});
+}, { timestamps: true });
 const User = model("User", userSchema);
 exports.default = User;
 //# sourceMappingURL=user.js.map
