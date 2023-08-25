@@ -1,9 +1,9 @@
 import { Application, Request, Response } from "express";
-import * as dotenv from "dotenv";
-import * as cors from "cors";
-import * as cookieParser from "cookie-parser";
-import * as morgan from "morgan";
-import * as express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import morgan from "morgan";
+import express from "express";
 dotenv.config();
 
 // Router imports

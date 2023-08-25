@@ -41,3 +41,35 @@ export interface IQRCode {
     group: string,
     controllingAdmin: string,
 }
+
+
+// Types after returned from Mongo
+export interface IUserObject extends IUser{
+    createdAt: Date,
+    updatedAt: Date,
+    _id: string
+}
+
+export interface IUserAccountObject extends IUserAccount{
+    createdAt: Date,
+    updatedAt: Date,
+    _id: string
+}
+
+export interface IQRCodeObject extends IQRCode{
+    createdAt: Date,
+    updatedAt: Date,
+    _id: string
+}
+
+export interface IScheduleObject extends ISchedule{
+    createdAt: Date,
+    updatedAt: Date,
+    _id: string
+}
+
+export interface IGroupObject extends IGroup{
+    createdAt: Date,
+    updatedAt: Date,
+    _id: string
+}
