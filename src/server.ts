@@ -11,6 +11,7 @@ import authRouter from "./controllers/auth";
 import groupRouter from "./controllers/group";
 import qrRouter from "./controllers/qrCode";
 import scheduleRouter from "./controllers/schedule";
+import userAccountRouter from "./controllers/userAccount"
 
 // Create application object
 const app: Application = express();
@@ -30,6 +31,7 @@ app.use("/auth", authRouter);
 app.use("/group", groupRouter);
 app.use("/qrcode", qrRouter);
 app.use("/schedule", scheduleRouter);
+app.use("/useraccount", userAccountRouter)
 
 app.get("/", (request: Request, response: Response) => {
     console.log(request.body);
