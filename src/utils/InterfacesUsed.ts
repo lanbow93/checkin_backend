@@ -27,7 +27,7 @@ export interface IGroup {
 }
 
 
-export interface Schedule {
+export interface ISchedule {
     user: string,
     group: string,
     assignedClockIn: Array<Date>,
