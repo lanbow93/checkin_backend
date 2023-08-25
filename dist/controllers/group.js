@@ -1,8 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express = require("express");
-const group_1 = require("../models/group");
-const router = express.Router();
+const express_1 = __importDefault(require("express"));
+const group_1 = __importDefault(require("../models/group"));
+const router = express_1.default.Router();
 router.get("/", async (request, response) => {
     const groupDate = group_1.default.find({});
     console.log({ groupDate });

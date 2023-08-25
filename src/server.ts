@@ -27,7 +27,7 @@ app.use(cookieParser());
 app.use(morgan("tiny"));
 
 // Routes
-app.use("/auth", authRouter);
+app.use("/user", authRouter);
 app.use("/group", groupRouter);
 app.use("/qrcode", qrRouter);
 app.use("/schedule", scheduleRouter);

@@ -1,8 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express = require("express");
-const schedule_1 = require("../models/schedule");
-const router = express.Router();
+const express_1 = __importDefault(require("express"));
+const schedule_1 = __importDefault(require("../models/schedule"));
+const router = express_1.default.Router();
 router.get("/", async (request, response) => {
     const scheduleInfo = await schedule_1.default.find({});
     console.log(scheduleInfo);
