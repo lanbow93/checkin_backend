@@ -10,7 +10,8 @@ const userAccountSchema = new Schema<IUserAccount>({
     groupNames: [String],
     currentTask: [[String, String]],
     adminOf: [String],
-    isGroupAdmin: Boolean
+    isGroupAdmin: Boolean,
+    isScheduleAdmin: Boolean
 }, {timestamps: true})
 
 const UserAccount = model("UserAccount", userAccountSchema)

@@ -18,6 +18,7 @@ export interface IUserAccount {
     adminOf: Array<string>,
     isSiteAdmin: boolean,
     isGroupAdmin: boolean,
+    isScheduleAdmin: boolean
 }
 
 export interface IGroup {

@@ -38,6 +38,7 @@ An easy application to check in employees at a kiosk area and validate attendanc
         * **adminOf** - Array[groupNames]
         * **isSiteAdmin** - boolean
         * **isGroupAdmin** - boolean
+        * **isScheduleAdmin** - boolean
         * **_id** - Mongo generated string
     * Schedules
         * **user** - UserAccount _id

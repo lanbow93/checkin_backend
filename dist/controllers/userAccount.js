@@ -14,16 +14,18 @@ router.get("/", async (request, response) => {
     });
 });
 router.post("/new", async (request, response) => {
+    request.body.name = request.body.name.toLowerCase().replace(/(?:^|\s|')\w/g, (m) => m.toUpperCase());
     try {
         const userAccountDetails = {
             name: request.body.name,
             badgeName: request.body.badgeName,
-            email: request.body.email,
+            email: request.body.email.toLowerCase(),
             groupNames: [],
             currentTask: ["Contact Manager To Be Added To Group", "System"],
             adminOf: [],
             isSiteAdmin: false,
-            isGroupAdmin: false
+            isGroupAdmin: false,
+            isScheduleAdmin: false
         };
         const newUserAccount = await userAccount_1.default.create(userAccountDetails);
         response.status(200).json({

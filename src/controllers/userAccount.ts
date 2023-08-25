@@ -13,16 +13,20 @@ router.get("/", async(request: express.Request, response: express.Response) => {
 })
 
 router.post("/new", async(request: express.Request, response: express.Response) => {
+
+    // Just to have name in proper case
+    request.body.name = request.body.name.toLowerCase().replace(/(?:^|\s|')\w/g, (m: string) => m.toUpperCase());
     try {
         const userAccountDetails: IUserAccount = {
             name: request.body.name,
             badgeName: request.body.badgeName,
-            email: request.body.email,
+            email: request.body.email.toLowerCase(),
             groupNames: [],
             currentTask: ["Contact Manager To Be Added To Group", "System"],
             adminOf: [],
             isSiteAdmin: false,
-            isGroupAdmin: false
+            isGroupAdmin: false,
+            isScheduleAdmin: false
         }
         const newUserAccount = await UserAccount.create(userAccountDetails)
         response.status(200).json({
