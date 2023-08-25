@@ -4,8 +4,8 @@ const connection_1 = require("../db/connection");
 const { Schema, model } = connection_1.default;
 const userAccountSchema = new Schema({
     name: String,
-    badgeName: String,
-    email: Number,
+    badgeName: { type: String, unique: true },
+    email: { type: String, unique: true },
     groupNames: [String],
     currentTask: [[String, String]],
     adminOf: [String],

@@ -5,8 +5,8 @@ const {Schema, model} = mongoose
 
 const userAccountSchema = new Schema<IUserAccount>({
     name: String,
-    badgeName: String,
-    email: Number,
+    badgeName: {type: String, unique: true},
+    email: {type: String, unique: true},
     groupNames: [String],
     currentTask: [[String, String]],
     adminOf: [String],

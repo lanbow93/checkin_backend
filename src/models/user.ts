@@ -4,9 +4,9 @@ import { IUser } from "../utils/InterfacesUsed";
 const {Schema, model} = mongoose
 
 const userSchema = new Schema<IUser>({
-    username: String,
+    username: {type: String, unique: true},
     password: String,
-    email: String,
+    email: {type: String, unique: true},
     resetToken: String,
     resetTokenExpiry: Date
 }, {timestamps: true})

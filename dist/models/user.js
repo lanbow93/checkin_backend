@@ -3,9 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const connection_1 = require("../db/connection");
 const { Schema, model } = connection_1.default;
 const userSchema = new Schema({
-    username: String,
+    username: { type: String, unique: true },
     password: String,
-    email: String,
+    email: { type: String, unique: true },
     resetToken: String,
     resetTokenExpiry: Date
 }, { timestamps: true });
