@@ -90,5 +90,29 @@ router.post("/login", async (request, response) => {
         });
     }
 });
+router.post("/forgotpassword", async (request, response) => {
+    try {
+        request.body.email = request.body.email.toLowerCase();
+        const user = await user_1.default.findOne({ email: request.body.email });
+        if (user) {
+            response.status(200).json({
+                message: "Successfully found email",
+                data: user
+            });
+        }
+        else {
+            response.status(200).json({
+                message: "Email Does Not Exist",
+                status: "Email Check Failed"
+            });
+        }
+    }
+    catch (error) {
+        response.status(400).json({
+            message: "Email Does Not Exist",
+            data: error
+        });
+    }
+});
 exports.default = router;
 //# sourceMappingURL=auth.js.map
