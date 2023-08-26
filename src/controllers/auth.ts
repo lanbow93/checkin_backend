@@ -4,7 +4,8 @@ import dotenv from "dotenv"
 // Model & Type Imports
 import User from "../models/user";
 // import UserAccount from "../models/userAccount";
-import { IUser } from "../utils/InterfacesUsed";
+import { IUser, IUserAccount } from "../utils/InterfacesUsed";
+import UserAccount from "../models/userAccount";
 
 dotenv.config()
 
@@ -21,8 +22,11 @@ router.get("/", async (request: express.Request, response: express.Response) => 
 
 router.post("/signup", async (request: express.Request, response: express.Response) => {
     try {
+        // Just to have name in proper case
+        request.body.name = request.body.name.toLowerCase().replace(/(?:^|\s|')\w/g, (m: string) => m.toUpperCase());
         // Hash password
         request.body.password = await bcrypt.hash(request.body.password, await bcrypt.genSalt(10))
+
         const userObject: IUser = {
             username: request.body.username.toLowerCase(),
             password: request.body.password,
@@ -30,13 +34,25 @@ router.post("/signup", async (request: express.Request, response: express.Respon
             resetToken: "",
             resetTokenExpiry: new Date()
         }
-        
         //generate user from received data
         const user: IUser = await User.create(userObject)
-        response.status(200).json({
-            message: "User Created",
-            data: user
-        })
+
+        const userAccountDetails: IUserAccount = {
+            name: request.body.name,
+            badgeName: request.body.badgeName,
+            email: request.body.email.toLowerCase(),
+            groupNames: [],
+            currentTask: ["Contact Manager To Be Added To Group", "System"],
+            adminOf: [],
+            isSiteAdmin: false,
+            isGroupAdmin: false,
+            isScheduleAdmin: false
+        }
+
+        const newUserAccount = await UserAccount.create(userAccountDetails)
+
+        response.status(200).json({message: "User Created",data:{user: user, accountData: newUserAccount}})
+
     } catch(error){
         response.status(400).json({
             message: "User Creation Failed",

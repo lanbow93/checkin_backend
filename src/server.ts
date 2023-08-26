@@ -19,9 +19,7 @@ const app: Application = express();
 
 // Middleware
 
-app.use(cors({
-    origin: ["http://localhost:7777"]
-}));
+app.use(cors({}));
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("tiny"));
