@@ -6,10 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_1 = __importDefault(require("../models/user"));
 const userAccount_1 = __importDefault(require("../models/userAccount"));
 dotenv_1.default.config();
 const router = express_1.default.Router();
+const SECRET = process.env.SECRET || "";
 router.get("/", async (request, response) => {
     console.log(request.body);
     response.status(200).json({
@@ -52,7 +54,34 @@ router.post("/signup", async (request, response) => {
 });
 router.post("/login", async (request, response) => {
     try {
-        console.log(request.body);
+        request.body.username = request.body.username.toLowerCase();
+        const { username, password } = request.body;
+        const user = await user_1.default.findOne({ username });
+        if (user) {
+            const passwordCheck = await bcryptjs_1.default.compare(password, user.password);
+            if (passwordCheck) {
+                const payload = { username };
+                const token = await jsonwebtoken_1.default.sign(payload, SECRET);
+                response.cookie("token", token, {
+                    httpOnly: true,
+                    path: "/",
+                    sameSite: "none",
+                    secure: request.hostname === "localhost" ? false : true
+                }).json({ payload, status: "logged in" });
+            }
+            else {
+                response.status(400).json({
+                    message: "Username/Password is incorrect",
+                    status: "Failed Pass Check"
+                });
+            }
+        }
+        else {
+            response.status(400).json({
+                message: "Username/Password is incorrect",
+                status: "Failed User Check"
+            });
+        }
     }
     catch (error) {
         response.status(400).json({

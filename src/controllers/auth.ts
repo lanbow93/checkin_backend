@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcryptjs"
 import dotenv from "dotenv"
+import jwt from "jsonwebtoken"
 // Model & Type Imports
 import User from "../models/user";
 // import UserAccount from "../models/userAccount";
@@ -10,6 +11,8 @@ import UserAccount from "../models/userAccount";
 dotenv.config()
 
 const router: express.Router = express.Router()
+
+const SECRET: string = process.env.SECRET || ""
 
 // Test Route
 router.get("/", async (request: express.Request, response: express.Response) => {
@@ -63,7 +66,36 @@ router.post("/signup", async (request: express.Request, response: express.Respon
 
 router.post("/login", async(request: express.Request, response: express.Response) => {
     try {
-        console.log(request.body)
+        request.body.username = request.body.username.toLowerCase()
+        const {username, password} = request.body
+        
+        // Searching collection for username
+        const user = await User.findOne({username})
+        // If user exists checks for password
+        if (user){
+            const passwordCheck: boolean = await bcrypt.compare(password, user.password)
+            if(passwordCheck){
+                const payload: object = {username}
+                const token = await jwt.sign(payload, SECRET)
+                response.cookie("token", token, {
+                    httpOnly: true,
+                    path:"/",
+                    sameSite: "none",
+                    secure: request.hostname === "localhost" ? false : true
+                }).json({payload, status: "logged in"})
+            } else {
+                response.status(400).json({
+                    message: "Username/Password is incorrect",
+                    status: "Failed Pass Check"
+                })
+            }
+        } else {
+            response.status(400).json({
+                message: "Username/Password is incorrect",
+                status: "Failed User Check"
+            })
+        }
+        
     } catch(error) {
         response.status(400).json({
             message: "Failed to Login",

@@ -54,7 +54,7 @@ An easy application to check in employees at a kiosk area and validate attendanc
 |Path | Suffix | Type | Description | Headers | 
 | ----------- | ----------- | ----------- | ----------- |  ----------- |
 |  |  |  |  |  |
-| /user | /signup | POST | User Sign Up <sub>(/useraccount/create)</sub> | N/A |
+| /user | /signup | POST | User Sign Up <sub>(Also Creates New UserAccount)</sub> | N/A |
 | /user | /login | POST | Sign In <sub>(Sends Web Token)</sub> | N/A |
 | /user | /forgotpassword/:id | PUT | Update Password <sub>(Forgotten)</sub> |  expiryToken |
 | /user | /emailupdate/:id | PUT | Update Email | userToken <sub>(Include Password)</sub> |
@@ -74,7 +74,6 @@ An easy application to check in employees at a kiosk area and validate attendanc
 | /group | /editadmins | PUT | Add/Remove Member To Admin Group <sub>(/useraccount/{ADD-DELETE}admin/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
 | /group | /delete/:id | DELETE | Deletes group |  userToken <sub>(isGroupAdmin)</sub> |
 |  |  |  |  |  |
-| /useraccount | /new | POST | Creates a new user <sub>(Internal Request)</sub> |  N/A |
 | /useraccount | /edit/:id | GET | Sends Info To Update <sub>(User Request)</sub> |  userToken |
 | /useraccount | /updatedetails/:id | PUT | Update Account Details <sub>(User Request)</sub> |  userToken |
 | /useraccount | /task/:id | PUT | Update Task |  userToken <sub>{Admin Of Group}</sub> |
