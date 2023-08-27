@@ -13,6 +13,7 @@ const userAccountSchema = new Schema({
     currentTask: [[String, String]],
     adminOf: [String],
     accountID: { type: String, unique: true },
+    isSiteAdmin: Boolean,
     isGroupAdmin: Boolean,
     isScheduleAdmin: Boolean
 }, { timestamps: true });

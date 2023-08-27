@@ -241,11 +241,24 @@ router.post("/logout", async (request, response) => {
         message: "Successful Logout"
     });
 });
-router.delete("delete/:id", async (request, response) => {
+router.delete("/delete/:id", async (request, response) => {
     try {
-        const possibleAdmin = await userAccount_1.default.findOne({ _id: request.params.requestor });
+        const possibleAdmin = await userAccount_1.default.findOne({ accountID: request.query.requestor });
         if (possibleAdmin) {
             if (possibleAdmin.isSiteAdmin) {
+                const deletedUser = await user_1.default.findByIdAndDelete(request.params.id);
+                if (deletedUser) {
+                    response.status(200).json({
+                        message: "User Successfully Deleted. Remember to remove from all Groups",
+                        data: deletedUser
+                    });
+                }
+                else {
+                    response.status(400).json({
+                        message: "User Not Found",
+                        status: "_id Not Located"
+                    });
+                }
             }
             else {
                 response.status(200).json({

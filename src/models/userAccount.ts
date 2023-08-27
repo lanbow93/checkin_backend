@@ -11,6 +11,7 @@ const userAccountSchema = new Schema<IUserAccount>({
     currentTask: [[String, String]],
     adminOf: [String],
     accountID: {type: String, unique: true},
+    isSiteAdmin: Boolean,
     isGroupAdmin: Boolean,
     isScheduleAdmin: Boolean
 }, {timestamps: true})

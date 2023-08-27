@@ -264,13 +264,23 @@ router.post("/logout", async (request: express.Request, response: express.Respon
 
 // Will need user verification token & IsSiteAdmin added later
 // Needed: query: requestor=requestor._id, 
-router.delete("delete/:id", async (request: express.Request, response: express.Response) => {
+router.delete("/delete/:id", async (request: express.Request, response: express.Response) => {
     try{
-        const possibleAdmin = await UserAccount.findOne({_id: request.params.requestor})
-
+        const possibleAdmin = await UserAccount.findOne({accountID: request.query.requestor})
         if(possibleAdmin){
             if(possibleAdmin.isSiteAdmin) {
-
+                const deletedUser = await User.findByIdAndDelete(request.params.id)
+                if(deletedUser){
+                    response.status(200).json({
+                        message: "User Successfully Deleted. Remember to remove from all Groups",
+                        data: deletedUser
+                    })
+                }else {
+                    response.status(400).json({
+                        message: "User Not Found",
+                        status: "_id Not Located"
+                    })
+                }
             } else {
                 response.status(200).json({
                     status: "User Not Site Admin",
@@ -283,7 +293,6 @@ router.delete("delete/:id", async (request: express.Request, response: express.R
                 message: "Failed User Deletion"
             })
         }
-
     } catch(error){
         response.status(400).json({
             status: "Failed Delete Request",
