@@ -186,5 +186,47 @@ router.put("/forgotpassword/:id", async (request, response) => {
         });
     }
 });
+router.put("/emailupdate/:id", async (request, response) => {
+    try {
+        const user = await user_1.default.findById(request.params.id);
+        if (user) {
+            const passwordCheck = await bcryptjs_1.default.compare(request.body.password, user.password);
+            if (passwordCheck) {
+                user.email = request.body.email.toLowerCase();
+                const newUser = await user_1.default.findByIdAndUpdate(request.params.id, user, { new: true });
+                if (newUser) {
+                    response.status(200).json({
+                        message: "Email Update Successful",
+                        data: newUser
+                    });
+                }
+                else {
+                    response.status(400).json({
+                        message: "Failed To Update Email",
+                        status: "User Found, Failed To Update Email"
+                    });
+                }
+            }
+            else {
+                response.status(400).json({
+                    message: "Failed To Update Email: Password Incorrect",
+                    status: "Incorrect Password"
+                });
+            }
+        }
+        else {
+            response.status(400).json({
+                message: "Failed To Update Email",
+                status: "_ID Match Failed"
+            });
+        }
+    }
+    catch (error) {
+        response.status(400).json({
+            message: "Failed To Update Email",
+            status: "Failed To Locate _ID"
+        });
+    }
+});
 exports.default = router;
 //# sourceMappingURL=auth.js.map

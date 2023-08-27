@@ -193,21 +193,55 @@ router.put("/forgotpassword/:id", async (request: express.Request, response: exp
                     status: "Failed To Verify resetToken"
                 })
             }
-
         } else {
             response.status(400).json({
                 message: "Failed To Find User",
                 status: "Username Lookup Failed"
             })
         }
-        
-
-
-
     }catch (error){
         response.status(400).json({
             message: "Failed To Update Password",
             data: error
+        })
+    }
+})
+
+router.put("/emailupdate/:id", async (request: express.Request, response: express.Response) => {
+    try{
+        const user = await User.findById(request.params.id)
+        if(user) {
+            const passwordCheck: boolean = await bcrypt.compare(request.body.password, user.password)
+            if (passwordCheck) {
+                user.email = request.body.email.toLowerCase()
+                const newUser = await User.findByIdAndUpdate(request.params.id, user, { new: true })
+                if(newUser){
+                    response.status(200).json({
+                        message: "Email Update Successful",
+                        data: newUser
+                    })
+                } else {
+                    response.status(400).json({
+                        message: "Failed To Update Email",
+                        status: "User Found, Failed To Update Email"
+                    })
+                }
+            } else {
+                response.status(400).json({
+                    message: "Failed To Update Email: Password Incorrect",
+                    status: "Incorrect Password"
+                })
+            }
+        } else{
+            response.status(400).json({
+                message: "Failed To Update Email",
+                status: "_ID Match Failed"
+            })
+        }
+    }catch(error){
+        response.status(400).json({
+            message: "Failed To Update Email",
+            status: "Failed To Locate _ID"
         })
     }
 })
