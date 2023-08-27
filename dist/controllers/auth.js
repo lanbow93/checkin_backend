@@ -228,5 +228,17 @@ router.put("/emailupdate/:id", async (request, response) => {
         });
     }
 });
+router.post("/logout", async (request, response) => {
+    response.cookie("token", "", {
+        httpOnly: true,
+        path: "/",
+        expires: new Date(0),
+        sameSite: "none",
+        secure: request.hostname === "http://localhost:7777" ? false : true,
+    }).status(200).json({
+        status: "Successful Logout",
+        message: "Successful Logout"
+    });
+});
 exports.default = router;
 //# sourceMappingURL=auth.js.map

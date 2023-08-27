@@ -246,4 +246,17 @@ router.put("/emailupdate/:id", async (request: express.Request, response: expres
     }
 })
 
+router.post("/logout", async (request: express.Request, response: express.Response) => {
+    response.cookie("token", "", {
+      httpOnly: true,
+      path: "/",
+      expires: new Date(0), // Set the expiration to a past date to delete the cookie
+      sameSite: "none",
+      secure: request.hostname === "http://localhost:7777" ? false : true, 
+    }).status(200).json({ 
+        status: "Successful Logout",
+        message: "Successful Logout"
+    });
+  });
+
 export default router
