@@ -7,7 +7,7 @@ import crypto from "crypto";
 // Model & Type Imports
 import User from "../models/user";
 // import UserAccount from "../models/userAccount";
-import { IUser, IUserAccount } from "../utils/InterfacesUsed";
+import { IUser, IUserAccount} from "../utils/InterfacesUsed";
 import UserAccount from "../models/userAccount";
 
 
@@ -107,7 +107,7 @@ router.post("/login", async(request: express.Request, response: express.Response
     }
 })
 
-router.post("/forgotpassword", async (request: express.Request, response: express.Response) => {
+router.put("/forgotpassword", async (request: express.Request, response: express.Response) => {
     try {
         request.body.email = request.body.email.toLowerCase()
         const user = await User.findOne({email: request.body.email})
@@ -150,6 +150,63 @@ router.post("/forgotpassword", async (request: express.Request, response: expres
     }catch(error){
         response.status(400).json({
             message: "Email Does Not Exist",
+            data: error
+        })
+    }
+})
+
+router.put("/forgotpassword/:id", async (request: express.Request, response: express.Response) => {
+    try {
+        const user = await User.findOne({username: request.body.username})
+        // If user exists
+        if(user){
+            const timeDifference = Math.abs(new Date().getTime() - user.resetTokenExpiry.getTime() ); // Difference in milliseconds
+            const fiveMinutesInMilliseconds = 5 * 60 * 1000; // 5 minutes in milliseconds
+            const isMoreThanFiveMinutes = timeDifference > fiveMinutesInMilliseconds;
+            if(user.resetToken === request.params.id){
+                if(!isMoreThanFiveMinutes){
+                    user.resetToken = ""
+                    request.body.password = await bcrypt.hash(request.body.password, await bcrypt.genSalt(10))
+                    user.password = request.body.password
+                    const newUser = await User.findOneAndUpdate({username: request.body.username}, user)
+                    response.status(200).json({
+                        message: "Password Updated Successfully",
+                        status: "Successful Reset",
+                        data: newUser
+                    })
+                } else {
+                    // Clears token after failed verification attempt
+                    user.resetToken = ""
+                    await User.findOneAndUpdate({username: request.body.username}, user)
+                    response.status(400).json({
+                        message: "Failed Password Reset",
+                        status: "resetToken Expired"
+                    })
+
+                }
+            } else {
+                // Clears token after failed verification attempt
+                user.resetToken = ""
+                await User.findOneAndUpdate({username: request.body.username}, user)
+                response.status(400).json({
+                    message: "Failed Password Reset",
+                    status: "Failed To Verify resetToken"
+                })
+            }
+
+        } else {
+            response.status(400).json({
+                message: "Failed To Find User",
+                status: "Username Lookup Failed"
+            })
+        }
+        
+
+
+
+    }catch (error){
+        response.status(400).json({
+            message: "Failed To Update Password",
             data: error
         })
     }

@@ -92,7 +92,7 @@ router.post("/login", async (request, response) => {
         });
     }
 });
-router.post("/forgotpassword", async (request, response) => {
+router.put("/forgotpassword", async (request, response) => {
     try {
         request.body.email = request.body.email.toLowerCase();
         const user = await user_1.default.findOne({ email: request.body.email });
@@ -131,6 +131,57 @@ router.post("/forgotpassword", async (request, response) => {
     catch (error) {
         response.status(400).json({
             message: "Email Does Not Exist",
+            data: error
+        });
+    }
+});
+router.put("/forgotpassword/:id", async (request, response) => {
+    try {
+        const user = await user_1.default.findOne({ username: request.body.username });
+        if (user) {
+            const timeDifference = Math.abs(new Date().getTime() - user.resetTokenExpiry.getTime());
+            const fiveMinutesInMilliseconds = 5 * 60 * 1000;
+            const isMoreThanFiveMinutes = timeDifference > fiveMinutesInMilliseconds;
+            if (user.resetToken === request.params.id) {
+                if (!isMoreThanFiveMinutes) {
+                    user.resetToken = "";
+                    request.body.password = await bcryptjs_1.default.hash(request.body.password, await bcryptjs_1.default.genSalt(10));
+                    user.password = request.body.password;
+                    const newUser = await user_1.default.findOneAndUpdate({ username: request.body.username }, user);
+                    response.status(200).json({
+                        message: "Password Updated Successfully",
+                        status: "Successful Reset",
+                        data: newUser
+                    });
+                }
+                else {
+                    user.resetToken = "";
+                    await user_1.default.findOneAndUpdate({ username: request.body.username }, user);
+                    response.status(400).json({
+                        message: "Failed Password Reset",
+                        status: "resetToken Expired"
+                    });
+                }
+            }
+            else {
+                user.resetToken = "";
+                await user_1.default.findOneAndUpdate({ username: request.body.username }, user);
+                response.status(400).json({
+                    message: "Failed Password Reset",
+                    status: "Failed To Verify resetToken"
+                });
+            }
+        }
+        else {
+            response.status(400).json({
+                message: "Failed To Find User",
+                status: "Username Lookup Failed"
+            });
+        }
+    }
+    catch (error) {
+        response.status(400).json({
+            message: "Failed To Update Password",
             data: error
         });
     }
