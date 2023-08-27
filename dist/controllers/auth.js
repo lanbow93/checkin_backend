@@ -40,6 +40,7 @@ router.post("/signup", async (request, response) => {
             groupNames: [],
             currentTask: ["Contact Manager To Be Added To Group", "System"],
             adminOf: [],
+            accountID: user._id,
             isSiteAdmin: false,
             isGroupAdmin: false,
             isScheduleAdmin: false
@@ -239,6 +240,33 @@ router.post("/logout", async (request, response) => {
         status: "Successful Logout",
         message: "Successful Logout"
     });
+});
+router.delete("delete/:id", async (request, response) => {
+    try {
+        const possibleAdmin = await userAccount_1.default.findOne({ _id: request.params.requestor });
+        if (possibleAdmin) {
+            if (possibleAdmin.isSiteAdmin) {
+            }
+            else {
+                response.status(200).json({
+                    status: "User Not Site Admin",
+                    message: "Unable To Delete User"
+                });
+            }
+        }
+        else {
+            response.status(400).json({
+                status: "Failed To Locate Requestor _id",
+                message: "Failed User Deletion"
+            });
+        }
+    }
+    catch (error) {
+        response.status(400).json({
+            status: "Failed Delete Request",
+            data: error
+        });
+    }
 });
 exports.default = router;
 //# sourceMappingURL=auth.js.map

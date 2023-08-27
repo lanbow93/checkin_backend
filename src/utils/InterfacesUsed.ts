@@ -16,6 +16,7 @@ export interface IUserAccount {
     groupNames: Array<string>,
     currentTask: [task: string, badgeNameOfGroupAdmin: string],
     adminOf: Array<string>,
+    accountID: string,
     isSiteAdmin: boolean,
     isGroupAdmin: boolean,
     isScheduleAdmin: boolean

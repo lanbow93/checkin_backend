@@ -41,7 +41,9 @@ router.post("/signup", async (request: express.Request, response: express.Respon
             resetTokenExpiry: new Date()
         }
         //generate user from received data
-        const user: IUser = await User.create(userObject)
+        // interface ICreationUser extends IUser {_id?: string}
+
+        const user: any = await User.create(userObject)
 
         const userAccountDetails: IUserAccount = {
             name: request.body.name,
@@ -50,6 +52,7 @@ router.post("/signup", async (request: express.Request, response: express.Respon
             groupNames: [],
             currentTask: ["Contact Manager To Be Added To Group", "System"],
             adminOf: [],
+            accountID: user._id,
             isSiteAdmin: false,
             isGroupAdmin: false,
             isScheduleAdmin: false
@@ -258,5 +261,35 @@ router.post("/logout", async (request: express.Request, response: express.Respon
         message: "Successful Logout"
     });
   });
+
+// Will need user verification token & IsSiteAdmin added later
+// Needed: query: requestor=requestor._id, 
+router.delete("delete/:id", async (request: express.Request, response: express.Response) => {
+    try{
+        const possibleAdmin = await UserAccount.findOne({_id: request.params.requestor})
+
+        if(possibleAdmin){
+            if(possibleAdmin.isSiteAdmin) {
+
+            } else {
+                response.status(200).json({
+                    status: "User Not Site Admin",
+                    message: "Unable To Delete User"
+                })
+            }
+        } else {
+            response.status(400).json({
+                status: "Failed To Locate Requestor _id",
+                message: "Failed User Deletion"
+            })
+        }
+
+    } catch(error){
+        response.status(400).json({
+            status: "Failed Delete Request",
+            data: error
+        })
+    }
+})
 
 export default router
