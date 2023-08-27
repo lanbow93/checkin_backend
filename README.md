@@ -10,6 +10,8 @@ An easy application to check in employees at a kiosk area and validate attendanc
     * MongoDB
     * React
     * Node
+    * Send Grid/mail
+    * Crypto
 * Models
     * QRCode
         * **accessCode** - String
@@ -56,9 +58,10 @@ An easy application to check in employees at a kiosk area and validate attendanc
 |  |  |  |  |  |
 | /user | /signup | POST | User Sign Up <sub>(Also Creates New UserAccount)</sub> | N/A |
 | /user | /login | POST | Sign In <sub>(Sends Web Token)</sub> | N/A |
-| /user | /forgotpassword/:id | PUT | Update Password <sub>(Forgotten)</sub> |  expiryToken |
+| /user | /forgotpassword | POST | Generate Email For Password Reset / Update Expiry String <sub>(Forgotten)</sub> | <sub>(Include Valid Email)</sub> |
+| /user | /forgotpassword/:id | PUT | Update Password <sub>(Forgotten)</sub> |  <sub>5 Minute Timer</sub> |
 | /user | /emailupdate/:id | PUT | Update Email | userToken <sub>(Include Password)</sub> |
-| /user | /passwordupdate/:id | PUT | Update Password <sub>(User Prompted)</sub> | userToken <sub>(IncludePassword)</sub> |
+| /user | /passwordupdate/:id | PUT | Update Password <sub>(User Prompted)</sub> | userToken <sub>(Include Password)</sub> |
 | /user | /logout | POST | Clears Web Token | N/A  |
 | /user | /delete/:id | POST | Delete User Account | userToken <sub>(isSiteAdmin)</sub> |
 |  |  |  |  |  |
