@@ -9,6 +9,7 @@ import User from "../models/user";
 // import UserAccount from "../models/userAccount";
 import { IUser, IUserAccount} from "../utils/InterfacesUsed";
 import UserAccount from "../models/userAccount";
+import userLoggedIn from "../utils/UserVerified";
 dotenv.config()
 
 const router: express.Router = express.Router()
@@ -191,7 +192,7 @@ router.put("/forgotpassword/:id", async (request: express.Request, response: exp
     }
 })
 
-router.put("/emailupdate/:id", async (request: express.Request, response: express.Response) => {
+router.put("/emailupdate/:id", userLoggedIn,  async (request: express.Request, response: express.Response) => {
     try{
         const user = await User.findById(request.params.id)
         if(user) {
@@ -244,7 +245,7 @@ router.post("/logout", async (request: express.Request, response: express.Respon
   });
 // Will need user verification token & IsSiteAdmin added later
 // Needed: query: requestor=requestor._id, 
-router.delete("/delete/:id", async (request: express.Request, response: express.Response) => {
+router.delete("/delete/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
     try{
         const possibleAdmin = await UserAccount.findOne({accountID: request.query.requestor})
         if(possibleAdmin){

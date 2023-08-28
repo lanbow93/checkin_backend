@@ -1,3 +1,5 @@
+import express from "express"
+import jwt from "jsonwebtoken"
 
 // Models Interfaces
 
@@ -74,4 +76,9 @@ export interface IGroupObject extends IGroup{
     createdAt: Date,
     updatedAt: Date,
     _id: string
+}
+
+//
+export interface IUserRequestVerification extends express.Request {
+    payload: jwt.JwtPayload | string
 }
