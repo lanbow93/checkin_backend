@@ -72,10 +72,10 @@ An easy application to check in employees at a kiosk area and validate attendanc
 | /qrcode | /verify | POST | Checks accessCode <sub>(/schedule/statusverified)</sub> |  userToken |
 | /qrcode | /delete/:id | DELETE | Deletes QR document  |  userToken <sub>(Specific Owner)</sub> |
 |  |  |  |  |  |
-| /group | /view | GET |  View Group Details |  userToken <sub>(isGroupAdmin)</sub> |
+| /group | /view/:id | GET |  View Group Details |  userToken <sub>(isGroupAdmin)</sub> |
 | /group | /new | POST |  Creates New Group  |  userToken <sub>(isGroupAdmin)</sub> |
-| /group | /editmembers | PUT | Add/Remove Member To Group <sub>(/useraccount/{ADD-DELETE}/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
-| /group | /editadmins | PUT | Add/Remove Member To Admin Group <sub>(/useraccount/{ADD-DELETE}admin/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
+| /group | /editmembers/:id | PUT | Add/Remove Member To Group <sub>(/useraccount/{ADD-DELETE}/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
+| /group | /editadmins/:id | PUT | Add/Remove Member To Admin Group <sub>(/useraccount/{ADD-DELETE}admin/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
 | /group | /delete/:id | DELETE | Deletes group |  userToken <sub>(isGroupAdmin)</sub> |
 |  |  |  |  |  |
 | /useraccount | /edit/:id | GET | Sends Info To Update <sub>(User Request)</sub> |  userToken |

@@ -2,7 +2,7 @@ import express from "express"
 import Group from "../models/group"
 import userLoggedIn from "../utils/UserVerified"
 import UserAccount from "../models/user"
-import { IGroup, IUserAccountObject } from "../utils/InterfacesUsed"
+import { IGroup, IGroupObject, IUserAccountObject } from "../utils/InterfacesUsed"
 
 const router: express.Router = express.Router()
 
@@ -16,7 +16,7 @@ router.get("/", async(request: express.Request, response: express.Response) => {
     })
 })
 
-// Needed: user._id, 
+// Needed: groupName = passed groupName | userID  
 router.post("/new", userLoggedIn, async (request: express.Request, response: express.Response) => {
     try{
         const userAccount: IUserAccountObject | null = await UserAccount.findOne({accountID: request.body.userID})
@@ -45,6 +45,30 @@ router.post("/new", userLoggedIn, async (request: express.Request, response: exp
     }
 })
 
+// Needed: requestorID = user._id | Params.id = group._id
+router.get("/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
+    try{
+        const group: IGroupObject | null = await Group.findById(request.params.id)
+        if(group) {
+            if(group.admins.indexOf(request.body.requestorID) !== -1){
+                response.status(200).json({
+                    status: "Successful GET Request",
+                    data: group
+                })
+            } else {
+                response.status(400).json({
+                    status: "Failed Admin Verification",
+                    message: "Failed To Get Group Informaiton"
+                })
+            }
+        }
+    }catch(error){
+        response.status(400).json({
+            status: "Failed To Locate Group._ID",
+            data: error
+        })
+    }
+})
 
 
 export default router

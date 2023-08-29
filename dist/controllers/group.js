@@ -46,5 +46,30 @@ router.post("/new", UserVerified_1.default, async (request, response) => {
         });
     }
 });
+router.get("/:id", UserVerified_1.default, async (request, response) => {
+    try {
+        const group = await group_1.default.findById(request.params.id);
+        if (group) {
+            if (group.admins.indexOf(request.body.requestorID) !== -1) {
+                response.status(200).json({
+                    status: "Successful GET Request",
+                    data: group
+                });
+            }
+            else {
+                response.status(400).json({
+                    status: "Failed Admin Verification",
+                    message: "Failed To Get Group Informaiton"
+                });
+            }
+        }
+    }
+    catch (error) {
+        response.status(400).json({
+            status: "Failed To Locate Group._ID",
+            data: error
+        });
+    }
+});
 exports.default = router;
 //# sourceMappingURL=group.js.map
