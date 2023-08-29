@@ -71,6 +71,7 @@ router.get("/:id", userLoggedIn, async (request: express.Request, response: expr
 })
 
 // Needed Params: id = group._id | groupUserArray = new member list array | requestorID = user._id
+
 router.put("/editmembers/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
     let submittedGroup = request.body.groupUserArray
     try{
@@ -80,7 +81,9 @@ router.put("/editmembers/:id", userLoggedIn, async (request: express.Request, re
                 for(let i=0; i<group.members.length; i++ ){
                     const currentUser = group.members[i]
                     if(!(submittedGroup.contains(currentUser))){
-                        
+                        //Needed Params.id = group | userToEdit = user_id
+                        const updatedUser = fetch(`http://localhost:4000/useraccount/changegroup/${'a'}`,  )
+                        console.log(updatedUser)
                     }
                 }
     

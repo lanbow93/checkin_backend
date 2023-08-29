@@ -17,20 +17,20 @@ router.get("/", async(request: express.Request, response: express.Response) => {
     }
 })
 
-//Needed Params.id = group | userToEdit = user_id
+//Needed Params.id = group._ id => Params.id userToEdit | userToEdit = user_id => groupToEdit = group._id
 router.put("/changegroup/:id", async(request: express.Request, response: express.Response) => {
     try {
-        const groupToChange = request.params.id
-        const userAccount: IUserAccount | null = await UserAccount.findOne({accountID: request.body.userToEdit})
-        console.log(request.body.userToEdit)
+        const userID= request.params.id
+        const groupID = request.body.groupToEdit
+        const userAccount: IUserAccount | null = await UserAccount.findOne({accountID: userID}) //request.body.userToEdit
         if (userAccount) {
             // Deletes group if found in group list | Adds group if not found on group array
-            if(userAccount.groupNames.includes(groupToChange)){
-                userAccount.groupNames.splice(userAccount.groupNames.indexOf(groupToChange), 1)
+            if(userAccount.groupNames.includes(groupID)){
+                userAccount.groupNames.splice(userAccount.groupNames.indexOf(groupID), 1)
             } else {
-                userAccount.groupNames.push(groupToChange)
+                userAccount.groupNames.push(groupID)
             }
-            const newUserAccount = await UserAccount.findOneAndUpdate({accountID: request.body.userToEdit}, userAccount, {new: true})
+            const newUserAccount = await UserAccount.findOneAndUpdate({accountID: userID}, userAccount, {new: true})
             if(newUserAccount){
                 response.status(200).json({
                     status: "Successful Group Update",

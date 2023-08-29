@@ -21,17 +21,17 @@ router.get("/", async (request, response) => {
 });
 router.put("/changegroup/:id", async (request, response) => {
     try {
-        const groupToChange = request.params.id;
-        const userAccount = await userAccount_1.default.findOne({ accountID: request.body.userToEdit });
-        console.log(request.body.userToEdit);
+        const userID = request.params.id;
+        const groupID = request.body.groupToEdit;
+        const userAccount = await userAccount_1.default.findOne({ accountID: userID });
         if (userAccount) {
-            if (userAccount.groupNames.includes(groupToChange)) {
-                userAccount.groupNames.splice(userAccount.groupNames.indexOf(groupToChange), 1);
+            if (userAccount.groupNames.includes(groupID)) {
+                userAccount.groupNames.splice(userAccount.groupNames.indexOf(groupID), 1);
             }
             else {
-                userAccount.groupNames.push(groupToChange);
+                userAccount.groupNames.push(groupID);
             }
-            const newUserAccount = await userAccount_1.default.findOneAndUpdate({ accountID: request.body.userToEdit }, userAccount, { new: true });
+            const newUserAccount = await userAccount_1.default.findOneAndUpdate({ accountID: userID }, userAccount, { new: true });
             if (newUserAccount) {
                 response.status(200).json({
                     status: "Successful Group Update",

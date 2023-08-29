@@ -80,6 +80,8 @@ router.put("/editmembers/:id", UserVerified_1.default, async (request, response)
                 for (let i = 0; i < group.members.length; i++) {
                     const currentUser = group.members[i];
                     if (!(submittedGroup.contains(currentUser))) {
+                        const updatedUser = fetch(`http://localhost:4000/useraccount/changegroup/${'a'}`);
+                        console.log(updatedUser);
                     }
                 }
             }
