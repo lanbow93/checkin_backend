@@ -16,7 +16,7 @@ router.get("/", async(request: express.Request, response: express.Response) => {
     })
 })
 
-// Needed: groupName = passed groupName | userID  
+// Needed: groupName = passed groupName | userID  = user._id
 router.post("/new", userLoggedIn, async (request: express.Request, response: express.Response) => {
     try{
         const userAccount: IUserAccountObject | null = await UserAccount.findOne({accountID: request.body.userID})
@@ -69,6 +69,7 @@ router.get("/:id", userLoggedIn, async (request: express.Request, response: expr
         })
     }
 })
+
 
 
 export default router

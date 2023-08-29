@@ -41,7 +41,7 @@ router.post("/signup", async (request, response) => {
             groupNames: [],
             currentTask: ["Contact Manager To Be Added To Group", "System"],
             adminOf: [],
-            accountID: user._id,
+            accountID: user._id.toString(),
             isSiteAdmin: false,
             isGroupAdmin: false,
             isScheduleAdmin: false

@@ -10,6 +10,7 @@ import User from "../models/user";
 import { IUser, IUserAccount} from "../utils/InterfacesUsed";
 import UserAccount from "../models/userAccount";
 import userLoggedIn from "../utils/UserVerified";
+import {Types} from "mongoose";
 dotenv.config()
 
 const router: express.Router = express.Router()
@@ -24,6 +25,7 @@ router.get("/", async (request: express.Request, response: express.Response) => 
     })
 })
 
+// Needed: name | password | email | username | badgeName
 router.post("/signup", async (request: express.Request, response: express.Response) => {
     try {
         // Just to have name in proper case
@@ -38,8 +40,8 @@ router.post("/signup", async (request: express.Request, response: express.Respon
             resetTokenExpiry: new Date()
         }
         //generate user from received data
-        // interface ICreationUser extends IUser {_id?: string}
-        const user: any = await User.create(userObject)
+        interface ICreationUser extends IUser {_id:  Types.ObjectId }
+        const user: ICreationUser = await User.create(userObject)
         const userAccountDetails: IUserAccount = {
             name: request.body.name,
             badgeName: request.body.badgeName,
@@ -47,7 +49,7 @@ router.post("/signup", async (request: express.Request, response: express.Respon
             groupNames: [],
             currentTask: ["Contact Manager To Be Added To Group", "System"],
             adminOf: [],
-            accountID: user._id,
+            accountID: user._id.toString(),
             isSiteAdmin: false,
             isGroupAdmin: false,
             isScheduleAdmin: false
@@ -61,6 +63,8 @@ router.post("/signup", async (request: express.Request, response: express.Respon
         })
     }
 })
+
+// Needed: username | password
 router.post("/login", async(request: express.Request, response: express.Response) => {
     try {
         request.body.username = request.body.username.toLowerCase()
@@ -98,6 +102,7 @@ router.post("/login", async(request: express.Request, response: express.Response
         })
     }
 })
+// Needed: email
 router.put("/forgotpassword", async (request: express.Request, response: express.Response) => {
     try {
         request.body.email = request.body.email.toLowerCase()
@@ -141,6 +146,7 @@ router.put("/forgotpassword", async (request: express.Request, response: express
         })
     }
 })
+//Needed: Params.id = resetToken string | username | password
 router.put("/forgotpassword/:id", async (request: express.Request, response: express.Response) => {
     try {
         const user = await User.findOne({username: request.body.username})
@@ -191,7 +197,7 @@ router.put("/forgotpassword/:id", async (request: express.Request, response: exp
         })
     }
 })
-
+//Needed: Params.id = user._id | password | new Email
 router.put("/emailupdate/:id", userLoggedIn,  async (request: express.Request, response: express.Response) => {
     try{
         const user = await User.findById(request.params.id)
@@ -243,8 +249,8 @@ router.post("/logout", async (request: express.Request, response: express.Respon
         message: "Successful Logout"
     });
   });
-// Will need user verification token & IsSiteAdmin added later
-// Needed: query: requestor=requestor._id, 
+
+// Needed: Params.id = user._id (to delete) | requestor = requestor._id 
 router.delete("/delete/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
     try{
         const possibleAdmin = await UserAccount.findOne({accountID: request.query.requestor})
