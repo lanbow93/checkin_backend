@@ -1,5 +1,8 @@
 import express from "express"
 import Group from "../models/group"
+import userLoggedIn from "../utils/UserVerified"
+import UserAccount from "../models/user"
+import { IGroup, IUserAccountObject } from "../utils/InterfacesUsed"
 
 const router: express.Router = express.Router()
 
@@ -12,6 +15,36 @@ router.get("/", async(request: express.Request, response: express.Response) => {
         status: "Successfully Reached"
     })
 })
+
+// Needed: user._id, 
+router.post("/new", userLoggedIn, async (request: express.Request, response: express.Response) => {
+    try{
+        const userAccount: IUserAccountObject | null = await UserAccount.findOne({accountID: request.body.userID})
+        if (userAccount) {
+            const group: IGroup = {
+                groupName: request.body.groupName,
+                admins:[userAccount._id],
+                members: [userAccount._id]
+            }
+            const newGroup: IGroup = await Group.create(group)
+            response.json({
+                status: "Successful Group Creation",
+                data: newGroup
+            })
+        } else {
+            response.status(400).json({
+                message: "Failed Group Creation",
+                status: "Unable To Locate userAccount"
+            })
+        }
+    } catch(error) {
+        response.status(400).json({
+            status:"Failed To Create Group",
+            message: "Group Creation Failed"
+        })
+    }
+})
+
 
 
 export default router
