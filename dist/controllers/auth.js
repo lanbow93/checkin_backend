@@ -52,7 +52,7 @@ router.post("/signup", async (request, response) => {
     catch (error) {
         response.status(400).json({
             message: "User Creation Failed",
-            data: error
+            error: error
         });
     }
 });
@@ -90,7 +90,7 @@ router.post("/login", async (request, response) => {
     catch (error) {
         response.status(400).json({
             message: "Failed to Login",
-            data: error
+            error: error
         });
     }
 });
@@ -133,7 +133,7 @@ router.put("/forgotpassword", async (request, response) => {
     catch (error) {
         response.status(400).json({
             message: "Email Does Not Exist",
-            data: error
+            error: error
         });
     }
 });
@@ -184,7 +184,7 @@ router.put("/forgotpassword/:id", async (request, response) => {
     catch (error) {
         response.status(400).json({
             message: "Failed To Update Password",
-            data: error
+            error: error
         });
     }
 });
@@ -278,7 +278,7 @@ router.delete("/delete/:id", UserVerified_1.default, async (request, response) =
     catch (error) {
         response.status(400).json({
             status: "Failed Delete Request",
-            data: error
+            error: error
         });
     }
 });

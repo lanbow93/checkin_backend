@@ -74,15 +74,14 @@ An easy application to check in employees at a kiosk area and validate attendanc
 |  |  |  |  |  |
 | /group | /view/:id | GET |  View Group Details |  userToken <sub>(isGroupAdmin)</sub> |
 | /group | /new | POST |  Creates New Group  |  userToken <sub>(isGroupAdmin)</sub> |
-| /group | /editmembers/:id | PUT | Add/Remove Member To Group <sub>(/useraccount/{ADD-DELETE}/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
-| /group | /editadmins/:id | PUT | Add/Remove Member To Admin Group <sub>(/useraccount/{ADD-DELETE}admin/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
+| /group | /editmembers/:id | PUT | Add/Remove Member To Group <sub>(/changegroup/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
+| /group | /editadmins/:id | PUT | Add/Remove Member To Admin Group <sub>(/useraccount/changeadmin/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
 | /group | /delete/:id | DELETE | Deletes group |  userToken <sub>(isGroupAdmin)</sub> |
 |  |  |  |  |  |
 | /useraccount | /edit/:id | GET | Sends Info To Update <sub>(User Request)</sub> |  userToken |
 | /useraccount | /updatedetails/:id | PUT | Update Account Details <sub>(User Request)</sub> |  userToken |
 | /useraccount | /task/:id | PUT | Update Task |  userToken <sub>{Admin Of Group}</sub> |
-| /useraccount | /addgroup/:id | PUT | Add User To Group <sub>(Internal Request)</sub> | N/A |
-| /useraccount | /removegroup/:id | PUT | Remove User From Group <sub>(Internal Request)</sub> | N/A |
+| /useraccount | /changegroup/:id | PUT | Add/Remove Member To Group <sub>(/useraccount/changegroup/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
 | /useraccount | /addgroupadmin/:id | PUT | Add User To Admin Group <sub>(Internal Request)</sub> | N/A |
 | /useraccount | /removegroupadmin/:id | PUT | Remove User From Admin Group <sub>(Internal Request)</sub> | N/A |
 |  |  |  |  |  |

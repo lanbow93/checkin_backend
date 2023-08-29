@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const group_1 = __importDefault(require("../models/group"));
 const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
-const user_1 = __importDefault(require("../models/user"));
+const userAccount_1 = __importDefault(require("../models/userAccount"));
 const router = express_1.default.Router();
 router.get("/", async (request, response) => {
     const groupDate = group_1.default.find({});
@@ -19,7 +19,7 @@ router.get("/", async (request, response) => {
 });
 router.post("/new", UserVerified_1.default, async (request, response) => {
     try {
-        const userAccount = await user_1.default.findOne({ accountID: request.body.userID });
+        const userAccount = await userAccount_1.default.findOne({ accountID: request.body.userID });
         if (userAccount) {
             const group = {
                 groupName: request.body.groupName,
@@ -50,7 +50,7 @@ router.get("/:id", UserVerified_1.default, async (request, response) => {
     try {
         const group = await group_1.default.findById(request.params.id);
         if (group) {
-            if (group.admins.indexOf(request.body.requestorID) !== -1) {
+            if (group.admins.includes(request.body.requestorID)) {
                 response.status(200).json({
                     status: "Successful GET Request",
                     data: group
@@ -67,7 +67,40 @@ router.get("/:id", UserVerified_1.default, async (request, response) => {
     catch (error) {
         response.status(400).json({
             status: "Failed To Locate Group._ID",
-            data: error
+            error: error
+        });
+    }
+});
+router.put("/editmembers/:id", UserVerified_1.default, async (request, response) => {
+    let submittedGroup = request.body.groupUserArray;
+    try {
+        const group = await group_1.default.findById(request.params.id);
+        if (group) {
+            if (group.admins.includes(request.body.requestorID)) {
+                for (let i = 0; i < group.members.length; i++) {
+                    const currentUser = group.members[i];
+                    if (!(submittedGroup.contains(currentUser))) {
+                    }
+                }
+            }
+            else {
+                response.status(400).json({
+                    status: "Unable To Locate .id In Admins",
+                    message: "Failed To Update Group"
+                });
+            }
+        }
+        else {
+            response.status(400).json({
+                status: "Unable To Locate group._id",
+                message: "Failed To Update Group"
+            });
+        }
+    }
+    catch (error) {
+        response.status(400).json({
+            status: "Failed Group Update",
+            error: error
         });
     }
 });

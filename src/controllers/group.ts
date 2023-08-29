@@ -1,7 +1,7 @@
 import express from "express"
 import Group from "../models/group"
 import userLoggedIn from "../utils/UserVerified"
-import UserAccount from "../models/user"
+import UserAccount from "../models/userAccount"
 import { IGroup, IGroupObject, IUserAccountObject } from "../utils/InterfacesUsed"
 
 const router: express.Router = express.Router()
@@ -50,7 +50,7 @@ router.get("/:id", userLoggedIn, async (request: express.Request, response: expr
     try{
         const group: IGroupObject | null = await Group.findById(request.params.id)
         if(group) {
-            if(group.admins.indexOf(request.body.requestorID) !== -1){
+            if(group.admins.includes(request.body.requestorID)){
                 response.status(200).json({
                     status: "Successful GET Request",
                     data: group
@@ -65,7 +65,41 @@ router.get("/:id", userLoggedIn, async (request: express.Request, response: expr
     }catch(error){
         response.status(400).json({
             status: "Failed To Locate Group._ID",
-            data: error
+            error: error
+        })
+    }
+})
+
+// Needed Params: id = group._id | groupUserArray = new member list array | requestorID = user._id
+router.put("/editmembers/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
+    let submittedGroup = request.body.groupUserArray
+    try{
+        const group = await Group.findById(request.params.id)
+        if(group) {
+            if(group.admins.includes(request.body.requestorID)){
+                for(let i=0; i<group.members.length; i++ ){
+                    const currentUser = group.members[i]
+                    if(!(submittedGroup.contains(currentUser))){
+                        
+                    }
+                }
+    
+            } else {
+                response.status(400).json({
+                    status: "Unable To Locate .id In Admins",
+                    message: "Failed To Update Group"
+                })
+            }
+        } else {
+            response.status(400).json({
+                status: "Unable To Locate group._id",
+                message: "Failed To Update Group"
+            })
+        }
+    }catch(error){
+        response.status(400).json({
+            status: "Failed Group Update",
+            error: error
         })
     }
 })

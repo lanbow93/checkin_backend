@@ -59,7 +59,7 @@ router.post("/signup", async (request: express.Request, response: express.Respon
     } catch(error){
         response.status(400).json({
             message: "User Creation Failed",
-            data: error
+            error: error
         })
     }
 })
@@ -98,7 +98,7 @@ router.post("/login", async(request: express.Request, response: express.Response
     } catch(error) {
         response.status(400).json({
             message: "Failed to Login",
-            data: error
+            error: error
         })
     }
 })
@@ -142,7 +142,7 @@ router.put("/forgotpassword", async (request: express.Request, response: express
     }catch(error){
         response.status(400).json({
             message: "Email Does Not Exist",
-            data: error
+            error: error
         })
     }
 })
@@ -193,7 +193,7 @@ router.put("/forgotpassword/:id", async (request: express.Request, response: exp
     }catch (error){
         response.status(400).json({
             message: "Failed To Update Password",
-            data: error
+            error: error
         })
     }
 })
@@ -283,7 +283,7 @@ router.delete("/delete/:id", userLoggedIn, async (request: express.Request, resp
     } catch(error){
         response.status(400).json({
             status: "Failed Delete Request",
-            data: error
+            error: error
         })
     }
 })
