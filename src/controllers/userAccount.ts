@@ -6,8 +6,8 @@ const router: express.Router = express.Router()
 // UNSECURE TEST ROUTE THAT NEEDS TO BE DELETED
 router.get("/", async(request: express.Request, response: express.Response) => {
     try {
-        request.body.user_id = "64ee2f65860504f62c4242fe"
-        const userAccounts = await UserAccount.findOne({accountID: request.body.user_id})
+        request.body.name = "Test"
+        const userAccounts = await UserAccount.find({})
         response.status(200).json({userAccounts})
     } catch(error) {
         response.status(400).json({

@@ -3,6 +3,7 @@ import Group from "../models/group"
 import userLoggedIn from "../utils/UserVerified"
 import UserAccount from "../models/userAccount"
 import { IGroup, IGroupObject, IUserAccountObject } from "../utils/InterfacesUsed"
+import { Types } from "mongoose"
 
 const router: express.Router = express.Router()
 
@@ -26,10 +27,14 @@ router.post("/new", userLoggedIn, async (request: express.Request, response: exp
                 admins:[userAccount._id],
                 members: [userAccount._id]
             }
-            const newGroup: IGroup = await Group.create(group)
+            interface ICreationGroup extends IGroup {_id:  Types.ObjectId }
+            const newGroup: ICreationGroup | null = await Group.create(group)
+            userAccount.adminOf.push(newGroup._id.toString())
+            userAccount.groupNames.push(newGroup._id.toString())
+            const newUserAccount: IUserAccountObject | null = await UserAccount.findOneAndUpdate({accountID: request.body.userID}, userAccount)
             response.json({
                 status: "Successful Group Creation",
-                data: newGroup
+                data: {newGroup, newUserAccount}
             })
         } else {
             response.status(400).json({

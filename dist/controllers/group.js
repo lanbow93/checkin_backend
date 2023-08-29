@@ -27,9 +27,12 @@ router.post("/new", UserVerified_1.default, async (request, response) => {
                 members: [userAccount._id]
             };
             const newGroup = await group_1.default.create(group);
+            userAccount.adminOf.push(newGroup._id.toString());
+            userAccount.groupNames.push(newGroup._id.toString());
+            const newUserAccount = await userAccount_1.default.findOneAndUpdate({ accountID: request.body.userID }, userAccount);
             response.json({
                 status: "Successful Group Creation",
-                data: newGroup
+                data: { newGroup, newUserAccount }
             });
         }
         else {

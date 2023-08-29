@@ -8,8 +8,8 @@ const userAccount_1 = __importDefault(require("../models/userAccount"));
 const router = express_1.default.Router();
 router.get("/", async (request, response) => {
     try {
-        request.body.user_id = "64ee2f65860504f62c4242fe";
-        const userAccounts = await userAccount_1.default.findOne({ accountID: request.body.user_id });
+        request.body.name = "Test";
+        const userAccounts = await userAccount_1.default.find({});
         response.status(200).json({ userAccounts });
     }
     catch (error) {
