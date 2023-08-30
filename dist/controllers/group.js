@@ -78,20 +78,15 @@ router.put("/editmembers/:id", UserVerified_1.default, async (request, response)
     const submittedGroup = request.body.groupUserArray;
     try {
         const group = await group_1.default.findById(request.params.id);
-        console.log({ group });
         if (group) {
             if (group.admins.includes(request.body.requestorID)) {
                 const differences = submittedGroup.filter((userID) => !group.members.includes(userID));
-                console.log(submittedGroup);
-                console.log({ differences });
                 group.members = submittedGroup;
                 const newGroup = await group_1.default.findByIdAndUpdate(request.params.id, group, { new: true });
                 let data = { newGroup };
                 for (let i = 0; i < differences.length; i++) {
-                    console.log(i);
                     try {
                         const userID = differences[i];
-                        console.log({ userID });
                         const groupID = request.params.id;
                         const userAccount = await userAccount_1.default.findOne({ accountID: userID });
                         if (userAccount) {
@@ -142,7 +137,6 @@ router.put("/editadmins/:id", UserVerified_1.default, async (request, response) 
     const submittedGroup = request.body.adminUserArray;
     try {
         const group = await group_1.default.findById(request.params.id);
-        console.log({ group });
         if (group) {
             if (group.admins.includes(request.body.requestorID)) {
                 const differences = submittedGroup.filter((userID) => !group.admins.includes(userID));
@@ -209,20 +203,19 @@ router.delete("/:id", UserVerified_1.default, async (request, response) => {
         const groupToDelete = await group_1.default.findById(request.params.id);
         if (groupToDelete) {
             if (groupToDelete.admins.includes(requestorID)) {
-                console.log(groupToDelete);
-                let data = {};
+                const deletedGroup = await group_1.default.findByIdAndDelete(request.params.id);
+                let data = { deletedGroup: deletedGroup };
                 for (let i = 0; i < groupToDelete.members.length; i++) {
-                    console.log(i);
-                    const accountToModify = await userAccount_1.default.findById(groupToDelete.members[i]);
+                    const accountToModify = await userAccount_1.default.findOne({ accountID: groupToDelete.members[i] });
                     if (accountToModify) {
                         if (accountToModify.adminOf.includes(request.params.id)) {
                             accountToModify.adminOf.splice(accountToModify.adminOf.indexOf(request.params.id), 1);
                         }
                         accountToModify.groupNames.splice(accountToModify.groupNames.indexOf(request.params.id), 1);
-                        const newAccount = await userAccount_1.default.findByIdAndUpdate(groupToDelete.members[i], accountToModify, { new: true });
+                        const newAccount = await userAccount_1.default.findOneAndUpdate({ accountID: groupToDelete.members[i] }, accountToModify, { new: true });
                         data[`user${i}`] = newAccount;
                     }
-                    if (i === groupToDelete.members.length) {
+                    if (i === groupToDelete.members.length - 1) {
                         response.status(200).json({
                             status: "Group Deletion Successful",
                             data: data
@@ -244,7 +237,6 @@ router.delete("/:id", UserVerified_1.default, async (request, response) => {
             error: error
         });
     }
-    98;
 });
 exports.default = router;
 //# sourceMappingURL=group.js.map

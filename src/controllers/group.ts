@@ -16,7 +16,6 @@ router.get("/", async(request: express.Request, response: express.Response) => {
         status: "Successfully Reached"
     })
 })
-
 // Needed: groupName = passed groupName | userID  = user._id
 router.post("/new", userLoggedIn, async (request: express.Request, response: express.Response) => {
     try{
@@ -49,7 +48,6 @@ router.post("/new", userLoggedIn, async (request: express.Request, response: exp
         })
     }
 })
-
 // Needed: requestorID = user._id | Params.id = group._id
 router.get("/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
     try{
@@ -74,30 +72,22 @@ router.get("/:id", userLoggedIn, async (request: express.Request, response: expr
         })
     }
 })
-
 // Needed Params: id = group._id | groupUserArray = new member list array | requestorID = user._id
-
 router.put("/editmembers/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
     const submittedGroup = request.body.groupUserArray
     try{
         const group = await Group.findById(request.params.id)
-        console.log({group})
         if(group) {
             if(group.admins.includes(request.body.requestorID)){
                 const differences = submittedGroup.filter((userID: string) => !group.members.includes(userID));
-                console.log(submittedGroup)
-                console.log({differences})
                 group.members = submittedGroup
                 const newGroup =  await Group.findByIdAndUpdate(request.params.id, group, {new: true})
                 let data: any= {newGroup}
                 for(let i=0; i< differences.length; i++) {
-                    console.log(i)
                     try {
                         const userID= differences[i] // User _id to change
-                        console.log({userID})
                         const groupID = request.params.id // group to add/remove
-                        const userAccount: IUserAccount | null = await UserAccount.findOne({accountID: userID}) //request.body.userToEdit
-                        
+                        const userAccount: IUserAccount | null = await UserAccount.findOne({accountID: userID}) 
                         if (userAccount) {
                             // Deletes group if found in group list | Adds group if not found on group array
                             if(userAccount.groupNames.includes(groupID)){
@@ -119,7 +109,6 @@ router.put("/editmembers/:id", userLoggedIn, async (request: express.Request, re
                     status: "Successful Group Update",
                     data: data
                 })
-    
             } else {
                 response.status(400).json({
                     status: "Unable To Locate .id In Admins",
@@ -139,13 +128,11 @@ router.put("/editmembers/:id", userLoggedIn, async (request: express.Request, re
         })
     }
 })
-
 // Needed Params: id = group._id | adminUserArray = new member list array | requestorID = user._id
 router.put("/editadmins/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
     const submittedGroup = request.body.adminUserArray
     try{
         const group = await Group.findById(request.params.id)
-        console.log({group})
         if(group) {
             if(group.admins.includes(request.body.requestorID)){
                 const differences = submittedGroup.filter((userID: string) => !group.admins.includes(userID));
@@ -203,36 +190,29 @@ router.put("/editadmins/:id", userLoggedIn, async (request: express.Request, res
         })
     }
 })
-// Needed Params: id = group._id | requestorID = user._id
+// Needed Params: id = group._id | Query.requestorID = user._id
 router.delete("/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
     const requestorID: string = request.query.requestorID?.toString() || ""
     try{
         const groupToDelete: IGroup | null = await Group.findById(request.params.id)
-        
         if(groupToDelete){
             if(groupToDelete.admins.includes(requestorID)){
-                // const deletedGroup = await Group.findByIdAndDelete(request.params.id)
-                
-                console.log(groupToDelete)
-                let data: any = {}
+                const deletedGroup = await Group.findByIdAndDelete(request.params.id)
+                let data: any = {deletedGroup:  deletedGroup}
                 for(let i=0; i< groupToDelete.members.length; i++){
-                    console.log(i)
-                    const accountToModify = await UserAccount.findById(groupToDelete.members[i])
+                    const accountToModify = await UserAccount.findOne({accountID: groupToDelete.members[i]})
                     if(accountToModify){
                         // If in adminlist, remove
                         if(accountToModify.adminOf.includes(request.params.id)){
                             accountToModify.adminOf.splice(accountToModify.adminOf.indexOf(request.params.id), 1)
                         }
-                        
                         accountToModify.groupNames.splice(accountToModify.groupNames.indexOf(request.params.id), 1)
                         // Updating account with info removed
-                        const newAccount = await UserAccount.findByIdAndUpdate(groupToDelete.members[i], accountToModify, {new: true})
+                        const newAccount = await UserAccount.findOneAndUpdate({accountID: groupToDelete.members[i]}, accountToModify, {new: true})
                         
                         data[`user${i}`] = newAccount
                     }
-
-
-                    if(i === groupToDelete.members.length){
+                    if(i === groupToDelete.members.length - 1){
                         response.status(200).json({
                             status: "Group Deletion Successful",
                             data: data
@@ -246,15 +226,12 @@ router.delete("/:id", userLoggedIn, async (request: express.Request, response: e
                 message: "Failed To Delete Group"
             })
         }
-
     }catch(error){
         response.status(400).json({
             status: "Failed To Delete Group",
             error: error
         })
-    }98
+    }
 })
-
-
 
 export default router
