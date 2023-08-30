@@ -138,5 +138,67 @@ router.put("/editmembers/:id", UserVerified_1.default, async (request, response)
         });
     }
 });
+router.put("/editadmins/:id", UserVerified_1.default, async (request, response) => {
+    const submittedGroup = request.body.groupUserArray;
+    try {
+        const group = await group_1.default.findById(request.params.id);
+        console.log({ group });
+        if (group) {
+            if (group.admins.includes(request.body.requestorID)) {
+                const differences = submittedGroup.filter((userID) => !group.admins.includes(userID));
+                console.log(submittedGroup);
+                console.log({ differences });
+                group.admins = submittedGroup;
+                const newGroup = await group_1.default.findByIdAndUpdate(request.params.id, group, { new: true });
+                let data = { newGroup };
+                for (let i = 0; i < differences.length; i++) {
+                    try {
+                        const userID = differences[i];
+                        const groupID = request.params.id;
+                        const userAccount = await userAccount_1.default.findOne({ accountID: userID });
+                        if (userAccount) {
+                            if (userAccount.adminOf.includes(groupID)) {
+                                userAccount.adminOf.splice(userAccount.adminOf.indexOf(groupID), 1);
+                            }
+                            else {
+                                userAccount.adminOf.push(groupID);
+                            }
+                            const updatedAccount = await userAccount_1.default.findOneAndUpdate({ accountID: userID }, userAccount, { new: true });
+                            data[`variable[${i}]`] = updatedAccount;
+                        }
+                    }
+                    catch (error) {
+                        response.status(400).json({
+                            status: "Failed To Update User Account",
+                            error: error
+                        });
+                    }
+                }
+                response.status(200).json({
+                    status: "Successful Admin Update",
+                    data: data
+                });
+            }
+            else {
+                response.status(400).json({
+                    status: "Unable To Locate .id In Admins",
+                    message: "Failed To Update Admin"
+                });
+            }
+        }
+        else {
+            response.status(400).json({
+                status: "Unable To Locate group._id",
+                message: "Failed To Update Admin"
+            });
+        }
+    }
+    catch (error) {
+        response.status(400).json({
+            status: "Failed Admin Update",
+            error: error
+        });
+    }
+});
 exports.default = router;
 //# sourceMappingURL=group.js.map

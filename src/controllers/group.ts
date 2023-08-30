@@ -140,6 +140,67 @@ router.put("/editmembers/:id", userLoggedIn, async (request: express.Request, re
     }
 })
 
+router.put("/editadmins/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
+    const submittedGroup = request.body.groupUserArray
+    try{
+        const group = await Group.findById(request.params.id)
+        console.log({group})
+        if(group) {
+            if(group.admins.includes(request.body.requestorID)){
+                const differences = submittedGroup.filter((userID: string) => !group.admins.includes(userID));
+                console.log(submittedGroup)
+                console.log({differences})
+                group.admins = submittedGroup
+                const newGroup =  await Group.findByIdAndUpdate(request.params.id, group, {new: true})
+                let data: any= {newGroup}
+                for(let i=0; i< differences.length; i++) {
+                    try {
+                        const userID= differences[i] // User _id to change
+                        const groupID = request.params.id // group to add/remove
+                        const userAccount: IUserAccount | null = await UserAccount.findOne({accountID: userID}) //request.body.userToEdit
+                        
+                        if (userAccount) {
+                            // Deletes group if found in group list | Adds group if not found on group array
+                            if(userAccount.adminOf.includes(groupID)){
+                                userAccount.adminOf.splice(userAccount.adminOf.indexOf(groupID), 1)
+                            } else {
+                                userAccount.adminOf.push(groupID)
+                            }
+                            const updatedAccount = await UserAccount.findOneAndUpdate({accountID: userID}, userAccount, {new: true})
+                            data[`variable[${i}]`]= updatedAccount
+                        }
+                    }catch(error){
+                        response.status(400).json({
+                            status: "Failed To Update User Account",
+                            error: error
+                        })
+                    }
+                }
+                response.status(200).json({
+                    status: "Successful Admin Update",
+                    data: data
+                })
+    
+            } else {
+                response.status(400).json({
+                    status: "Unable To Locate .id In Admins",
+                    message: "Failed To Update Admin"
+                })
+            }
+        } else {
+            response.status(400).json({
+                status: "Unable To Locate group._id",
+                message: "Failed To Update Admin"
+            })
+        }
+    }catch(error){
+        response.status(400).json({
+            status: "Failed Admin Update",
+            error: error
+        })
+    }
+})
+
 
 
 export default router
