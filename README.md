@@ -75,14 +75,12 @@ An easy application to check in employees at a kiosk area and validate attendanc
 | /group | /view/:id | GET |  View Group Details |  userToken <sub>(isGroupAdmin)</sub> |
 | /group | /new | POST |  Creates New Group  |  userToken <sub>(isGroupAdmin)</sub> |
 | /group | /editmembers/:id | PUT | Add/Remove Member To Group && Adds group to UserAccount  |  userToken <sub>(isGroupAdmin)</sub> |
-| /group | /editadmins/:id | PUT | Add/Remove Member To Admin Group <sub>(/useraccount/changeadmin/:id)</sub>  |  userToken <sub>(isGroupAdmin)</sub> |
+| /group | /editadmins/:id | PUT | Add/Remove Member To Admin Group && Adds Group To Admin on UserAccount  |  userToken <sub>(isGroupAdmin)</sub> |
 | /group | /delete/:id | DELETE | Deletes group |  userToken <sub>(isGroupAdmin)</sub> |
 |  |  |  |  |  |
 | /useraccount | /edit/:id | GET | Sends Info To Update <sub>(User Request)</sub> |  userToken |
 | /useraccount | /updatedetails/:id | PUT | Update Account Details <sub>(User Request)</sub> |  userToken |
 | /useraccount | /task/:id | PUT | Update Task |  userToken <sub>{Admin Of Group}</sub> |
-| /useraccount | /addgroupadmin/:id | PUT | Add User To Admin Group <sub>(Internal Request)</sub> | N/A |
-| /useraccount | /removegroupadmin/:id | PUT | Remove User From Admin Group <sub>(Internal Request)</sub> | N/A |
 |  |  |  |  |  |
 | /schedule | /new | POST | Creates Blank Schedule For User <sub>(InternalRequest)</sub> |  N/A |
 | /schedule | /addschedule | PUT | Adds New Dates To Schedule |  userToken <sub>(AdminOfGroup)</sub> |

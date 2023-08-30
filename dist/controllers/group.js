@@ -139,18 +139,15 @@ router.put("/editmembers/:id", UserVerified_1.default, async (request, response)
     }
 });
 router.put("/editadmins/:id", UserVerified_1.default, async (request, response) => {
-    const submittedGroup = request.body.groupUserArray;
+    const submittedGroup = request.body.adminUserArray;
     try {
         const group = await group_1.default.findById(request.params.id);
         console.log({ group });
         if (group) {
             if (group.admins.includes(request.body.requestorID)) {
                 const differences = submittedGroup.filter((userID) => !group.admins.includes(userID));
-                console.log(submittedGroup);
-                console.log({ differences });
                 group.admins = submittedGroup;
-                const newGroup = await group_1.default.findByIdAndUpdate(request.params.id, group, { new: true });
-                let data = { newGroup };
+                let data = {};
                 for (let i = 0; i < differences.length; i++) {
                     try {
                         const userID = differences[i];
@@ -162,6 +159,10 @@ router.put("/editadmins/:id", UserVerified_1.default, async (request, response) 
                             }
                             else {
                                 userAccount.adminOf.push(groupID);
+                                if (!userAccount.groupNames.includes(groupID)) {
+                                    userAccount.groupNames.push(groupID);
+                                    group.members.push(groupID);
+                                }
                             }
                             const updatedAccount = await userAccount_1.default.findOneAndUpdate({ accountID: userID }, userAccount, { new: true });
                             data[`variable[${i}]`] = updatedAccount;
@@ -174,6 +175,8 @@ router.put("/editadmins/:id", UserVerified_1.default, async (request, response) 
                         });
                     }
                 }
+                const newGroup = await group_1.default.findByIdAndUpdate(request.params.id, group, { new: true });
+                data.newGroup = newGroup;
                 response.status(200).json({
                     status: "Successful Admin Update",
                     data: data
@@ -199,6 +202,49 @@ router.put("/editadmins/:id", UserVerified_1.default, async (request, response) 
             error: error
         });
     }
+});
+router.delete("/:id", UserVerified_1.default, async (request, response) => {
+    const requestorID = request.query.requestorID?.toString() || "";
+    try {
+        const groupToDelete = await group_1.default.findById(request.params.id);
+        if (groupToDelete) {
+            if (groupToDelete.admins.includes(requestorID)) {
+                console.log(groupToDelete);
+                let data = {};
+                for (let i = 0; i < groupToDelete.members.length; i++) {
+                    console.log(i);
+                    const accountToModify = await userAccount_1.default.findById(groupToDelete.members[i]);
+                    if (accountToModify) {
+                        if (accountToModify.adminOf.includes(request.params.id)) {
+                            accountToModify.adminOf.splice(accountToModify.adminOf.indexOf(request.params.id), 1);
+                        }
+                        accountToModify.groupNames.splice(accountToModify.groupNames.indexOf(request.params.id), 1);
+                        const newAccount = await userAccount_1.default.findByIdAndUpdate(groupToDelete.members[i], accountToModify, { new: true });
+                        data[`user${i}`] = newAccount;
+                    }
+                    if (i === groupToDelete.members.length) {
+                        response.status(200).json({
+                            status: "Group Deletion Successful",
+                            data: data
+                        });
+                    }
+                }
+            }
+        }
+        else {
+            response.status(400).json({
+                status: "Unable To Locate Group._ID",
+                message: "Failed To Delete Group"
+            });
+        }
+    }
+    catch (error) {
+        response.status(400).json({
+            status: "Failed To Delete Group",
+            error: error
+        });
+    }
+    98;
 });
 exports.default = router;
 //# sourceMappingURL=group.js.map
