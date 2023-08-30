@@ -19,46 +19,5 @@ router.get("/", async (request, response) => {
         });
     }
 });
-router.put("/changegroup/:id", async (request, response) => {
-    try {
-        const userID = request.params.id;
-        const groupID = request.body.groupToEdit;
-        const userAccount = await userAccount_1.default.findOne({ accountID: userID });
-        if (userAccount) {
-            if (userAccount.groupNames.includes(groupID)) {
-                userAccount.groupNames.splice(userAccount.groupNames.indexOf(groupID), 1);
-            }
-            else {
-                userAccount.groupNames.push(groupID);
-            }
-            const newUserAccount = await userAccount_1.default.findOneAndUpdate({ accountID: userID }, userAccount, { new: true });
-            if (newUserAccount) {
-                response.status(200).json({
-                    status: "Successful Group Update",
-                    data: newUserAccount
-                });
-            }
-            else {
-                response.status(400).json({
-                    status: "Failed To Locate User For Update",
-                    message: "Failed To Update User Groups"
-                });
-            }
-        }
-        else {
-            response.status(400).json({
-                status: "Failed To Locate User",
-                message: "Unable To Change User",
-                data: userAccount
-            });
-        }
-    }
-    catch (error) {
-        response.status(400).json({
-            status: "Failed To Update User Account",
-            error: error
-        });
-    }
-});
 exports.default = router;
 //# sourceMappingURL=userAccount.js.map

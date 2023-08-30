@@ -23,8 +23,8 @@ router.post("/new", UserVerified_1.default, async (request, response) => {
         if (userAccount) {
             const group = {
                 groupName: request.body.groupName,
-                admins: [userAccount._id],
-                members: [userAccount._id]
+                admins: [request.body.userID],
+                members: [request.body.userID]
             };
             const newGroup = await group_1.default.create(group);
             userAccount.adminOf.push(newGroup._id.toString());
@@ -75,18 +75,47 @@ router.get("/:id", UserVerified_1.default, async (request, response) => {
     }
 });
 router.put("/editmembers/:id", UserVerified_1.default, async (request, response) => {
-    let submittedGroup = request.body.groupUserArray;
+    const submittedGroup = request.body.groupUserArray;
     try {
         const group = await group_1.default.findById(request.params.id);
+        console.log({ group });
         if (group) {
             if (group.admins.includes(request.body.requestorID)) {
-                for (let i = 0; i < group.members.length; i++) {
-                    const currentUser = group.members[i];
-                    if (!(submittedGroup.contains(currentUser))) {
-                        const updatedUser = fetch(`http://localhost:4000/useraccount/changegroup/${'a'}`);
-                        console.log(updatedUser);
+                const differences = submittedGroup.filter((userID) => !group.members.includes(userID));
+                console.log(submittedGroup);
+                console.log({ differences });
+                group.members = submittedGroup;
+                const newGroup = await group_1.default.findByIdAndUpdate(request.params.id, group, { new: true });
+                let data = { newGroup };
+                for (let i = 0; i < differences.length; i++) {
+                    console.log(i);
+                    try {
+                        const userID = differences[i];
+                        console.log({ userID });
+                        const groupID = request.params.id;
+                        const userAccount = await userAccount_1.default.findOne({ accountID: userID });
+                        if (userAccount) {
+                            if (userAccount.groupNames.includes(groupID)) {
+                                userAccount.groupNames.splice(userAccount.groupNames.indexOf(groupID), 1);
+                            }
+                            else {
+                                userAccount.groupNames.push(groupID);
+                            }
+                            const updatedAccount = await userAccount_1.default.findOneAndUpdate({ accountID: userID }, userAccount, { new: true });
+                            data[`variable[${i}]`] = updatedAccount;
+                        }
+                    }
+                    catch (error) {
+                        response.status(400).json({
+                            status: "Failed To Update User Account",
+                            error: error
+                        });
                     }
                 }
+                response.status(200).json({
+                    status: "Successful Group Update",
+                    data: data
+                });
             }
             else {
                 response.status(400).json({

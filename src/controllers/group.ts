@@ -2,7 +2,7 @@ import express from "express"
 import Group from "../models/group"
 import userLoggedIn from "../utils/UserVerified"
 import UserAccount from "../models/userAccount"
-import { IGroup, IGroupObject, IUserAccountObject } from "../utils/InterfacesUsed"
+import { IGroup, IGroupObject, IUserAccount, IUserAccountObject } from "../utils/InterfacesUsed"
 import { Types } from "mongoose"
 
 const router: express.Router = express.Router()
@@ -24,8 +24,8 @@ router.post("/new", userLoggedIn, async (request: express.Request, response: exp
         if (userAccount) {
             const group: IGroup = {
                 groupName: request.body.groupName,
-                admins:[userAccount._id],
-                members: [userAccount._id]
+                admins:[request.body.userID],
+                members: [request.body.userID]
             }
             interface ICreationGroup extends IGroup {_id:  Types.ObjectId }
             const newGroup: ICreationGroup | null = await Group.create(group)
@@ -78,19 +78,47 @@ router.get("/:id", userLoggedIn, async (request: express.Request, response: expr
 // Needed Params: id = group._id | groupUserArray = new member list array | requestorID = user._id
 
 router.put("/editmembers/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
-    let submittedGroup = request.body.groupUserArray
+    const submittedGroup = request.body.groupUserArray
     try{
         const group = await Group.findById(request.params.id)
+        console.log({group})
         if(group) {
             if(group.admins.includes(request.body.requestorID)){
-                for(let i=0; i<group.members.length; i++ ){
-                    const currentUser = group.members[i]
-                    if(!(submittedGroup.contains(currentUser))){
-                        //Needed Params.id = group | userToEdit = user_id
-                        const updatedUser = fetch(`http://localhost:4000/useraccount/changegroup/${'a'}`,  )
-                        console.log(updatedUser)
+                const differences = submittedGroup.filter((userID: string) => !group.members.includes(userID));
+                console.log(submittedGroup)
+                console.log({differences})
+                group.members = submittedGroup
+                const newGroup =  await Group.findByIdAndUpdate(request.params.id, group, {new: true})
+                let data: any= {newGroup}
+                for(let i=0; i< differences.length; i++) {
+                    console.log(i)
+                    try {
+                        const userID= differences[i] // User _id to change
+                        console.log({userID})
+                        const groupID = request.params.id // group to add/remove
+                        const userAccount: IUserAccount | null = await UserAccount.findOne({accountID: userID}) //request.body.userToEdit
+                        
+                        if (userAccount) {
+                            // Deletes group if found in group list | Adds group if not found on group array
+                            if(userAccount.groupNames.includes(groupID)){
+                                userAccount.groupNames.splice(userAccount.groupNames.indexOf(groupID), 1)
+                            } else {
+                                userAccount.groupNames.push(groupID)
+                            }
+                            const updatedAccount = await UserAccount.findOneAndUpdate({accountID: userID}, userAccount, {new: true})
+                            data[`variable[${i}]`]= updatedAccount
+                        }
+                    }catch(error){
+                        response.status(400).json({
+                            status: "Failed To Update User Account",
+                            error: error
+                        })
                     }
                 }
+                response.status(200).json({
+                    status: "Successful Group Update",
+                    data: data
+                })
     
             } else {
                 response.status(400).json({
