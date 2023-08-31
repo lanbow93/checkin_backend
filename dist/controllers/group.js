@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const group_1 = __importDefault(require("../models/group"));
 const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
 const userAccount_1 = __importDefault(require("../models/userAccount"));
+const SharedFunctions_1 = require("../utils/SharedFunctions");
 const router = express_1.default.Router();
 router.get("/", async (request, response) => {
     const groupDate = group_1.default.find({});
@@ -27,26 +28,27 @@ router.post("/new", UserVerified_1.default, async (request, response) => {
                 members: [request.body.userID]
             };
             const newGroup = await group_1.default.create(group);
-            userAccount.adminOf.push(newGroup._id.toString());
-            userAccount.groupNames.push(newGroup._id.toString());
-            const newUserAccount = await userAccount_1.default.findOneAndUpdate({ accountID: request.body.userID }, userAccount);
-            response.json({
-                status: "Successful Group Creation",
-                data: { newGroup, newUserAccount }
-            });
+            if (newGroup) {
+                userAccount.adminOf.push(newGroup._id.toString());
+                userAccount.groupNames.push(newGroup._id.toString());
+                const newUserAccount = await userAccount_1.default.findOneAndUpdate({ accountID: request.body.userID }, userAccount);
+                if (newUserAccount) {
+                    (0, SharedFunctions_1.successfulRequest)(response, "Successful Group Creation", `New Group Created With ${userAccount.badgeName} As Admin`, { newGroup, newUserAccount });
+                }
+                else {
+                    (0, SharedFunctions_1.failedRequest)(response, "Failed To Update User Account", "Failed Group Creation", "Error Unknown");
+                }
+            }
+            else {
+                (0, SharedFunctions_1.failedRequest)(response, "Failed To Create New Group", "Unable To Create New Group", "Error Unknown");
+            }
         }
         else {
-            response.status(400).json({
-                message: "Failed Group Creation",
-                status: "Unable To Locate userAccount"
-            });
+            (0, SharedFunctions_1.failedRequest)(response, "Failed Group Creation", "Unable To Locate Account", "Unable To Find UserAccount");
         }
     }
     catch (error) {
-        response.status(400).json({
-            status: "Failed To Create Group",
-            message: "Group Creation Failed"
-        });
+        (0, SharedFunctions_1.failedRequest)(response, "Failed To Create Group", "Group Creation Failed", "Unable To Create Group: Unknown");
     }
 });
 router.get("/:id", UserVerified_1.default, async (request, response) => {
@@ -54,24 +56,15 @@ router.get("/:id", UserVerified_1.default, async (request, response) => {
         const group = await group_1.default.findById(request.params.id);
         if (group) {
             if (group.admins.includes(request.body.requestorID)) {
-                response.status(200).json({
-                    status: "Successful GET Request",
-                    data: group
-                });
+                (0, SharedFunctions_1.successfulRequest)(response, "Successful Get Request", "Request Successful", group);
             }
             else {
-                response.status(400).json({
-                    status: "Failed Admin Verification",
-                    message: "Failed To Get Group Informaiton"
-                });
+                (0, SharedFunctions_1.failedRequest)(response, "Failed Admin Verification", "Failed To Get Group Information", "Not An Admin");
             }
         }
     }
     catch (error) {
-        response.status(400).json({
-            status: "Failed To Locate Group._ID",
-            error: error
-        });
+        (0, SharedFunctions_1.failedRequest)(response, "Failed To Locate Group._ID", "Unable To View Group", { error });
     }
 });
 router.put("/editmembers/:id", UserVerified_1.default, async (request, response) => {
@@ -82,55 +75,48 @@ router.put("/editmembers/:id", UserVerified_1.default, async (request, response)
             if (group.admins.includes(request.body.requestorID)) {
                 const differences = submittedGroup.filter((userID) => !group.members.includes(userID));
                 group.members = submittedGroup;
-                const newGroup = await group_1.default.findByIdAndUpdate(request.params.id, group, { new: true });
-                let data = { newGroup };
-                for (let i = 0; i < differences.length; i++) {
-                    try {
-                        const userID = differences[i];
-                        const groupID = request.params.id;
-                        const userAccount = await userAccount_1.default.findOne({ accountID: userID });
-                        if (userAccount) {
-                            if (userAccount.groupNames.includes(groupID)) {
-                                userAccount.groupNames.splice(userAccount.groupNames.indexOf(groupID), 1);
+                try {
+                    const newGroup = await group_1.default.findByIdAndUpdate(request.params.id, group, { new: true });
+                    let data = { newGroup };
+                    for (let i = 0; i < differences.length; i++) {
+                        try {
+                            const userID = differences[i];
+                            const groupID = request.params.id;
+                            const userAccount = await userAccount_1.default.findOne({ accountID: userID });
+                            if (userAccount) {
+                                if (userAccount.groupNames.includes(groupID)) {
+                                    userAccount.groupNames.splice(userAccount.groupNames.indexOf(groupID), 1);
+                                }
+                                else {
+                                    userAccount.groupNames.push(groupID);
+                                }
+                                const updatedAccount = await userAccount_1.default.findOneAndUpdate({ accountID: userID }, userAccount, { new: true });
+                                data[`variable[${i}]`] = updatedAccount;
                             }
-                            else {
-                                userAccount.groupNames.push(groupID);
-                            }
-                            const updatedAccount = await userAccount_1.default.findOneAndUpdate({ accountID: userID }, userAccount, { new: true });
-                            data[`variable[${i}]`] = updatedAccount;
+                        }
+                        catch (error) {
+                            response.status(400).json({
+                                status: "Failed To Update User Account",
+                                error: error
+                            });
                         }
                     }
-                    catch (error) {
-                        response.status(400).json({
-                            status: "Failed To Update User Account",
-                            error: error
-                        });
-                    }
+                    (0, SharedFunctions_1.successfulRequest)(response, "Successful Group Update", "Successfully Updated Members", data);
                 }
-                response.status(200).json({
-                    status: "Successful Group Update",
-                    data: data
-                });
+                catch (error) {
+                    (0, SharedFunctions_1.failedRequest)(response, "Failed Before Loop", "Failed Group Update: Unknown", "Failed To Update Group");
+                }
             }
             else {
-                response.status(400).json({
-                    status: "Unable To Locate .id In Admins",
-                    message: "Failed To Update Group"
-                });
+                (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate _ID In Admins", "Failed To Update Group: Admin Permission Issue", "Not An Admin Of Group");
             }
         }
         else {
-            response.status(400).json({
-                status: "Unable To Locate group._id",
-                message: "Failed To Update Group"
-            });
+            (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Group._ID", "Failed To Update Group", "Group._ID Not Located");
         }
     }
     catch (error) {
-        response.status(400).json({
-            status: "Failed Group Update",
-            error: error
-        });
+        (0, SharedFunctions_1.failedRequest)(response, "Failed Group Update", "Failed To Update Members", { error });
     }
 });
 router.put("/editadmins/:id", UserVerified_1.default, async (request, response) => {
@@ -163,38 +149,29 @@ router.put("/editadmins/:id", UserVerified_1.default, async (request, response) 
                         }
                     }
                     catch (error) {
-                        response.status(400).json({
-                            status: "Failed To Update User Account",
-                            error: error
-                        });
+                        (0, SharedFunctions_1.failedRequest)(response, "Failed To Update User Account", "Failed User Group Update", { error });
+                        break;
                     }
                 }
                 const newGroup = await group_1.default.findByIdAndUpdate(request.params.id, group, { new: true });
-                data.newGroup = newGroup;
-                response.status(200).json({
-                    status: "Successful Admin Update",
-                    data: data
-                });
+                if (newGroup) {
+                    data.newGroup = newGroup;
+                    (0, SharedFunctions_1.successfulRequest)(response, "Successful Admin Update", "Admin Record Changed Successfully", data);
+                }
+                else {
+                    (0, SharedFunctions_1.failedRequest)(response, "Failed On Group Update Attempt", "Unable To Update Admin List", "Failed During Grop Update");
+                }
             }
             else {
-                response.status(400).json({
-                    status: "Unable To Locate .id In Admins",
-                    message: "Failed To Update Admin"
-                });
+                (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate .id In Admins", "Failed To Update Admin", "No Admin Permissions");
             }
         }
         else {
-            response.status(400).json({
-                status: "Unable To Locate group._id",
-                message: "Failed To Update Admin"
-            });
+            (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Group._ID", "Failed To Update Admin", "Unable To Locate Group");
         }
     }
     catch (error) {
-        response.status(400).json({
-            status: "Failed Admin Update",
-            error: error
-        });
+        (0, SharedFunctions_1.failedRequest)(response, "Failed Admin Update", "Unable To Update Admin List", { error });
     }
 });
 router.delete("/:id", UserVerified_1.default, async (request, response) => {
@@ -216,26 +193,17 @@ router.delete("/:id", UserVerified_1.default, async (request, response) => {
                         data[`user${i}`] = newAccount;
                     }
                     if (i === groupToDelete.members.length - 1) {
-                        response.status(200).json({
-                            status: "Group Deletion Successful",
-                            data: data
-                        });
+                        (0, SharedFunctions_1.successfulRequest)(response, "Group Deletion Successful", `Successfully Deleted Group ${groupToDelete.groupName}`, data);
                     }
                 }
             }
         }
         else {
-            response.status(400).json({
-                status: "Unable To Locate Group._ID",
-                message: "Failed To Delete Group"
-            });
+            (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Group._ID", "Failed To Delete Group", "Group.ID Issue");
         }
     }
     catch (error) {
-        response.status(400).json({
-            status: "Failed To Delete Group",
-            error: error
-        });
+        (0, SharedFunctions_1.failedRequest)(response, "Failed To Delete Group", "Failed To Delete Group", { error });
     }
 });
 exports.default = router;

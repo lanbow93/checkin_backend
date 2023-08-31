@@ -31,24 +31,20 @@ router.post("/new", UserVerified_1.default, async (request, response) => {
             controllingAdmin: request.body.adminID
         });
         if (existingMatch) {
-            response.status(400).json({
-                status: "Duplicate QR Code Exists",
-                message: "Unable To Make QR Code"
-            });
+            (0, SharedFunctions_1.failedRequest)(response, "Duplicate QR Code Exists", "QR Already Exists. Go To QR and Generate", "Unable To Make QR: Duplicate");
         }
         else {
-            qrCode_1.default.create(newQR);
-            response.status(200).json({
-                status: "Successful QR Creation",
-                data: newQR
-            });
+            const createdQR = await qrCode_1.default.create(newQR);
+            if (createdQR) {
+                (0, SharedFunctions_1.successfulRequest)(response, "Successful QR Generation", "New QR Account Made", createdQR);
+            }
+            else {
+                (0, SharedFunctions_1.failedRequest)(response, "Failed To Generate New QR", "Unable To Generate QR", "Unable To Generate QR: Unknown");
+            }
         }
     }
     catch (error) {
-        response.status(400).json({
-            status: "Failed To Create QR",
-            error: error
-        });
+        (0, SharedFunctions_1.failedRequest)(response, "Failed To Create", "Unable To Create QR", { error });
     }
 });
 router.put("/generate/:id", UserVerified_1.default, async (request, response) => {
@@ -61,37 +57,27 @@ router.put("/generate/:id", UserVerified_1.default, async (request, response) =>
                 qrObject.expiryTime = new Date();
                 try {
                     const newQR = await qrCode_1.default.findByIdAndUpdate(request.params.id, qrObject, { new: true });
-                    response.status(200).json({
-                        status: "New QR Generated",
-                        data: newQR
-                    });
+                    if (newQR) {
+                        (0, SharedFunctions_1.successfulRequest)(response, "New QR Generated", "New QR Account Generated", newQR);
+                    }
+                    else {
+                        (0, SharedFunctions_1.failedRequest)(response, "Failed To Get Response Back", "Unable To Update QR", "Unable To Update QR");
+                    }
                 }
                 catch (error) {
-                    response.status(400).json({
-                        status: "Failed To Update QR",
-                        error: error
-                    });
+                    (0, SharedFunctions_1.failedRequest)(response, "Failed To Find & Update QR by ._id", "Unable To Update QR", { error });
                 }
             }
             else {
-                response.status(400).json({
-                    status: "Failed To Verify Controlling Admin",
-                    message: "Failed To Verify Account. Delete And Generate New QR"
-                });
+                (0, SharedFunctions_1.failedRequest)(response, "Failed To Verify Controlling Admin", "Failed To Verify Account. Delete And Generate New QR", "Failed To Verify Account");
             }
         }
         else {
-            response.status(400).json({
-                status: "Failed To Locate QR Object",
-                message: "Failed To Generate QR. Need To Setup New QR"
-            });
+            (0, SharedFunctions_1.failedRequest)(response, "Failed To Locate QR Object By ._id", "Failed TO Generate QR. Need To Setup New QR", "Unable to Locate QR");
         }
     }
     catch (error) {
-        response.status(400).json({
-            status: "Failed QR Generation",
-            error: error
-        });
+        (0, SharedFunctions_1.failedRequest)(response, "Failed QR Generation", "Unable To Generate QR Code", { error });
     }
 });
 router.delete("/:id", UserVerified_1.default, async (request, response) => {
@@ -116,8 +102,7 @@ router.delete("/:id", UserVerified_1.default, async (request, response) => {
         }
     }
     catch (error) {
-        const errorObject = { error };
-        (0, SharedFunctions_1.failedRequest)(response, "Failed To Delete QR", "Unable To Delete QR", errorObject);
+        (0, SharedFunctions_1.failedRequest)(response, "Failed To Delete QR", "Unable To Delete QR", { error });
     }
 });
 exports.default = router;

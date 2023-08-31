@@ -8,6 +8,7 @@ import crypto from "crypto";
 import User from "../models/user";
 // import UserAccount from "../models/userAccount";
 import { IUser, IUserAccount} from "../utils/InterfacesUsed";
+import { successfulRequest, failedRequest } from "../utils/SharedFunctions";
 import UserAccount from "../models/userAccount";
 import userLoggedIn from "../utils/UserVerified";
 import {Types} from "mongoose";
@@ -25,7 +26,11 @@ router.get("/", async (request: express.Request, response: express.Response) => 
     })
 })
 
-// Needed: name | password | email | username | badgeName
+// Needed: 
+/*
+Purpose: Creates a new user
+Needed: name | password | email | username | badgeName
+*/
 router.post("/signup", async (request: express.Request, response: express.Response) => {
     try {
         // Just to have name in proper case
@@ -41,6 +46,7 @@ router.post("/signup", async (request: express.Request, response: express.Respon
         }
         //generate user from received data
         interface ICreationUser extends IUser {_id:  Types.ObjectId }
+        // Check to see if badge name exists
         const user: ICreationUser = await User.create(userObject)
         const userAccountDetails: IUserAccount = {
             name: request.body.name,
@@ -55,8 +61,9 @@ router.post("/signup", async (request: express.Request, response: express.Respon
             isScheduleAdmin: false
         }
         const newUserAccount = await UserAccount.create(userAccountDetails)
-        response.status(200).json({message: "User Created",data:{user: user, accountData: newUserAccount}})
+        successfulRequest(response, "Successful User Creation", "New User Created", {user: user, accountData: newUserAccount})
     } catch(error){
+        failedRequest(response,"User Creation Failed","Signup Failed", {error} )
         response.status(400).json({
             message: "User Creation Failed",
             error: error

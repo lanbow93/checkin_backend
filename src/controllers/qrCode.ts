@@ -34,22 +34,17 @@ router.post("/new", userLoggedIn, async (request: express.Request, response: exp
             controllingAdmin: request.body.adminID
         })
         if(existingMatch) {
-            response.status(400).json({
-                status: "Duplicate QR Code Exists",
-                message: "Unable To Make QR Code"
-            })
+            failedRequest(response, "Duplicate QR Code Exists", "QR Already Exists. Go To QR and Generate", "Unable To Make QR: Duplicate")
         } else {
-            QRCode.create(newQR)
-            response.status(200).json({
-                status: "Successful QR Creation",
-                data: newQR
-            })
+            const createdQR: IQRCode | null = await QRCode.create(newQR)
+            if(createdQR){
+                successfulRequest(response, "Successful QR Generation", "New QR Account Made", createdQR)
+            } else {
+                failedRequest(response, "Failed To Generate New QR", "Unable To Generate QR", "Unable To Generate QR: Unknown")
+            }
         }
     } catch(error) {
-        response.status(400).json({
-            status: "Failed To Create QR",
-            error: error
-        })
+        failedRequest(response, "Failed To Create", "Unable To Create QR", {error})
     }
 })
 /*
@@ -65,34 +60,23 @@ router.put("/generate/:id", userLoggedIn, async (request: express.Request, respo
                 qrObject.accessCode = qrString;
                 qrObject.expiryTime = new Date()
                 try {
-                    const newQR = await QRCode.findByIdAndUpdate(request.params.id, qrObject, {new: true})
-                    response.status(200).json({
-                        status: "New QR Generated",
-                        data: newQR
-                    })
+                    const newQR: IQRCode | null = await QRCode.findByIdAndUpdate(request.params.id, qrObject, {new: true})
+                    if(newQR){
+                        successfulRequest(response, "New QR Generated", "New QR Account Generated", newQR)
+                    } else {
+                        failedRequest(response, "Failed To Get Response Back", "Unable To Update QR", "Unable To Update QR")
+                    }
                 } catch(error){
-                    response.status(400).json({
-                        status: "Failed To Update QR",
-                        error: error
-                    })
+                    failedRequest(response, "Failed To Find & Update QR by ._id", "Unable To Update QR", {error})
                 }
             } else {
-                response.status(400).json({
-                    status: "Failed To Verify Controlling Admin",
-                    message: "Failed To Verify Account. Delete And Generate New QR"
-                })
+                failedRequest(response, "Failed To Verify Controlling Admin", "Failed To Verify Account. Delete And Generate New QR", "Failed To Verify Account")
             }
         }else{
-            response.status(400).json({
-                status: "Failed To Locate QR Object",
-                message: "Failed To Generate QR. Need To Setup New QR"
-            })
+            failedRequest(response, "Failed To Locate QR Object By ._id", "Failed TO Generate QR. Need To Setup New QR", "Unable to Locate QR")
         }
     } catch(error){
-        response.status(400).json({
-            status: "Failed QR Generation",
-            error: error
-        })
+        failedRequest(response, "Failed QR Generation", "Unable To Generate QR Code", {error})
     }
 })
 
@@ -127,8 +111,7 @@ router.delete("/:id", userLoggedIn, async (request: express.Request, response: e
             failedRequest(response, "Failed To Locate QR._id", "Unable To Delete QR", "Unable To Delete QR")
         }
     } catch (error) {
-        const errorObject = {error}
-        failedRequest(response, "Failed To Delete QR", "Unable To Delete QR", errorObject)
+        failedRequest(response, "Failed To Delete QR", "Unable To Delete QR", {error})
     }
 })
 

@@ -10,6 +10,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mail_1 = __importDefault(require("@sendgrid/mail"));
 const crypto_1 = __importDefault(require("crypto"));
 const user_1 = __importDefault(require("../models/user"));
+const SharedFunctions_1 = require("../utils/SharedFunctions");
 const userAccount_1 = __importDefault(require("../models/userAccount"));
 const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
 dotenv_1.default.config();
@@ -47,9 +48,10 @@ router.post("/signup", async (request, response) => {
             isScheduleAdmin: false
         };
         const newUserAccount = await userAccount_1.default.create(userAccountDetails);
-        response.status(200).json({ message: "User Created", data: { user: user, accountData: newUserAccount } });
+        (0, SharedFunctions_1.successfulRequest)(response, "Successful User Creation", "New User Created", { user: user, accountData: newUserAccount });
     }
     catch (error) {
+        (0, SharedFunctions_1.failedRequest)(response, "User Creation Failed", "Signup Failed", { error });
         response.status(400).json({
             message: "User Creation Failed",
             error: error
