@@ -68,8 +68,7 @@ An easy application to check in employees at a kiosk area and validate attendanc
 |  |  |  |  |  |
 | /qrcode | /new | POST | New QR Validation Created | userToken <sub>(Admin Of Group)</sub>  |
 | /qrcode | /generate/:id | PUT |  Random string provided for QR <sub>Updates String && Expiry Time</sub> |  userToken <sub>(Admin Of Group)</sub>|
-| /qrcode | /update/:id | PUT |   <sub>(Internal Request)</sub>|  userToken <sub>(Specific Owner)</sub> |
-| /qrcode | /verify | POST | Checks accessCode <sub>(/schedule/statusverified)</sub> |  userToken |
+| /qrcode | /verify | GET | Checks accessCode <sub>(Returns QRVerified Token)</sub> |  userToken |
 | /qrcode | /delete/:id | DELETE | Deletes QR document  |  userToken <sub>(Specific Owner)</sub> |
 |  |  |  |  |  |
 | /group | /view/:id | GET |  View Group Details |  userToken <sub>(isGroupAdmin)</sub> |
@@ -87,5 +86,5 @@ An easy application to check in employees at a kiosk area and validate attendanc
 | /schedule | /:id | GET | View Schedule |  userToken <sub>(ScheduleAdminGroup-AdminOfGroup-SpecifiedUser)<sub> |
 | /schedule | /edit/:id | GET | View Schedule To Edit |  userToken <sub>(ScheduleAdminGroup)<sub> |
 | /schedule | /update/:id | POST | Edit Schedule |  userToken <sub>(ScheduleAdminGroup)<sub> |
-| /schedule | /statusverifiedin | PUT | Adds Punch In/Out <sub>(InternalRequest)<sub>  |  N/A |
+| /schedule | /statusverifiedin | PUT | Adds Punch In/Out   |  N/A |
 

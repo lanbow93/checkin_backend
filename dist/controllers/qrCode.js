@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const qrCode_1 = __importDefault(require("../models/qrCode"));
 const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
 const crypto_1 = __importDefault(require("crypto"));
+const SharedFunctions_1 = require("../utils/SharedFunctions");
 const router = express_1.default.Router();
 router.get("/", async (request, response) => {
     const qrData = await qrCode_1.default.find({});
@@ -91,6 +92,32 @@ router.put("/generate/:id", UserVerified_1.default, async (request, response) =>
             status: "Failed QR Generation",
             error: error
         });
+    }
+});
+router.delete("/:id", UserVerified_1.default, async (request, response) => {
+    try {
+        const qrToDelete = await qrCode_1.default.findById(request.params.id);
+        if (qrToDelete) {
+            if (qrToDelete.controllingAdmin === request.query.requestorID) {
+                const deletedQR = await qrCode_1.default.findByIdAndDelete(request.params.id);
+                if (deletedQR) {
+                    (0, SharedFunctions_1.successfulRequest)(response, "QR Deletion Successful", "The QR Account Was Successfully Deleted", deletedQR);
+                }
+                else {
+                    (0, SharedFunctions_1.failedRequest)(response, "Failed Deletion By ID", "Error: Failed To Delete", "Unable To Delete");
+                }
+            }
+            else {
+                (0, SharedFunctions_1.failedRequest)(response, "Failed To Verify Admin._id", "Unable To Delete QR: No Permissions", "Unable To Delete QR");
+            }
+        }
+        else {
+            (0, SharedFunctions_1.failedRequest)(response, "Failed To Locate QR._id", "Unable To Delete QR", "Unable To Delete QR");
+        }
+    }
+    catch (error) {
+        const errorObject = { error };
+        (0, SharedFunctions_1.failedRequest)(response, "Failed To Delete QR", "Unable To Delete QR", errorObject);
     }
 });
 exports.default = router;
