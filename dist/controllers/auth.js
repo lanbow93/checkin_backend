@@ -34,28 +34,35 @@ router.post("/signup", async (request, response) => {
             resetToken: "",
             resetTokenExpiry: new Date()
         };
-        const user = await user_1.default.create(userObject);
-        const userAccountDetails = {
-            name: request.body.name,
-            badgeName: request.body.badgeName,
-            email: request.body.email.toLowerCase(),
-            groupNames: [],
-            currentTask: ["Contact Manager To Be Added To Group", "System"],
-            adminOf: [],
-            accountID: user._id.toString(),
-            isSiteAdmin: false,
-            isGroupAdmin: false,
-            isScheduleAdmin: false
-        };
-        const newUserAccount = await userAccount_1.default.create(userAccountDetails);
-        (0, SharedFunctions_1.successfulRequest)(response, "Successful User Creation", "New User Created", { user: user, accountData: newUserAccount });
+        const badgeNameAccountCheck = await userAccount_1.default.findOne({ badgeName: request.body.badgeName });
+        if (badgeNameAccountCheck) {
+            (0, SharedFunctions_1.failedRequest)(response, "Failed User Creation", "Failed To Create User. Badge Name exists.", "UserAccount Found With BadgeName");
+        }
+        else {
+            const user = await user_1.default.create(userObject);
+            const userAccountDetails = {
+                name: request.body.name,
+                badgeName: request.body.badgeName,
+                email: request.body.email.toLowerCase(),
+                groupNames: [],
+                currentTask: ["Contact Manager To Be Added To Group", "System"],
+                adminOf: [],
+                accountID: user._id.toString(),
+                isSiteAdmin: false,
+                isGroupAdmin: false,
+                isScheduleAdmin: false
+            };
+            try {
+                const newUserAccount = await userAccount_1.default.create(userAccountDetails);
+                (0, SharedFunctions_1.successfulRequest)(response, "Successful User Creation", "New User Created", { user: user, accountData: newUserAccount });
+            }
+            catch (error) {
+                (0, SharedFunctions_1.failedRequest)(response, "Failed User Creation", "Unable To Create User", { error });
+            }
+        }
     }
     catch (error) {
         (0, SharedFunctions_1.failedRequest)(response, "User Creation Failed", "Signup Failed", { error });
-        response.status(400).json({
-            message: "User Creation Failed",
-            error: error
-        });
     }
 });
 router.post("/login", async (request, response) => {
