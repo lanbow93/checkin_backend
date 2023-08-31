@@ -15,5 +15,38 @@ router.get("/", async (request, response) => {
         status: "Reached Successfully"
     });
 });
+router.post("/new", async (request, response) => {
+    try {
+        const newQR = {
+            accessCode: "",
+            expiryTime: new Date(),
+            group: request.body.groupID,
+            controllingAdmin: request.body.adminID
+        };
+        const existingMatch = await qrCode_1.default.findOne({
+            group: request.body.groupID,
+            controllingAdmin: request.body.adminID
+        });
+        if (existingMatch) {
+            response.status(400).json({
+                status: "Duplicate QR Code Exists",
+                message: "Unable To Make QR Code"
+            });
+        }
+        else {
+            qrCode_1.default.create(newQR);
+            response.status(200).json({
+                status: "Successful QR Creation",
+                data: newQR
+            });
+        }
+    }
+    catch (error) {
+        response.status(400).json({
+            status: "Failed To Create QR",
+            error: error
+        });
+    }
+});
 exports.default = router;
 //# sourceMappingURL=qrCode.js.map
