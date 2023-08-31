@@ -67,8 +67,8 @@ An easy application to check in employees at a kiosk area and validate attendanc
 | /user | /delete/:id | POST | Delete User Account | userToken <sub>(isSiteAdmin)</sub> |
 |  |  |  |  |  |
 | /qrcode | /new | POST | New QR Validation Created | userToken <sub>(Admin Of Group)</sub>  |
-| /qrcode | /generate/:id | GET | Random string provided for QR <sub>(/qrcode/update/:id)</sub> |  userToken <sub>(Admin Of Group)</sub>|
-| /qrcode | /update/:id | PUT | Updates String && Expiry Time  <sub>(Internal Request)</sub>|  userToken <sub>(Specific Owner)</sub> |
+| /qrcode | /generate/:id | PUT |  Random string provided for QR <sub>Updates String && Expiry Time</sub> |  userToken <sub>(Admin Of Group)</sub>|
+| /qrcode | /update/:id | PUT |   <sub>(Internal Request)</sub>|  userToken <sub>(Specific Owner)</sub> |
 | /qrcode | /verify | POST | Checks accessCode <sub>(/schedule/statusverified)</sub> |  userToken |
 | /qrcode | /delete/:id | DELETE | Deletes QR document  |  userToken <sub>(Specific Owner)</sub> |
 |  |  |  |  |  |
