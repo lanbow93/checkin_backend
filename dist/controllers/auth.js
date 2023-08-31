@@ -75,32 +75,23 @@ router.post("/login", async (request, response) => {
             if (passwordCheck) {
                 const payload = { username };
                 const token = await jsonwebtoken_1.default.sign(payload, SECRET);
-                response.cookie("token", token, {
+                response.status(200).cookie("token", token, {
                     httpOnly: true,
                     path: "/",
                     sameSite: "none",
                     secure: request.hostname === "localhost" ? false : true
-                }).json({ payload, status: "logged in" });
+                }).json({ status: "Logged In", message: "Successfully Logged In", data: payload });
             }
             else {
-                response.status(400).json({
-                    message: "Username/Password is incorrect",
-                    status: "Failed Pass Check"
-                });
+                (0, SharedFunctions_1.failedRequest)(response, "Failed Password Check", "Username/Password Is Incorrect", "Invalid Username/Password");
             }
         }
         else {
-            response.status(400).json({
-                message: "Username/Password is incorrect",
-                status: "Failed User Check"
-            });
+            (0, SharedFunctions_1.failedRequest)(response, "Failed Username Check", "Username/Password Is Incorrect", "Invalid Username/Password");
         }
     }
     catch (error) {
-        response.status(400).json({
-            message: "Failed to Login",
-            error: error
-        });
+        (0, SharedFunctions_1.failedRequest)(response, "Login Failed", "Failed To Login", { error });
     }
 });
 router.put("/forgotpassword", async (request, response) => {

@@ -76,7 +76,10 @@ router.post("/signup", async (request: express.Request, response: express.Respon
     }
 })
 
-// Needed: username | password
+/*
+Purpose: Login and user provided cookie
+Needed: username | password
+*/
 router.post("/login", async(request: express.Request, response: express.Response) => {
     try {
         request.body.username = request.body.username.toLowerCase()
@@ -89,29 +92,20 @@ router.post("/login", async(request: express.Request, response: express.Response
             if(passwordCheck){
                 const payload: object = {username}
                 const token = await jwt.sign(payload, SECRET)
-                response.cookie("token", token, {
+                response.status(200).cookie("token", token, {
                     httpOnly: true,
                     path:"/",
                     sameSite: "none",
                     secure: request.hostname === "localhost" ? false : true
-                }).json({payload, status: "logged in"})
+                }).json({status: "Logged In", message: "Successfully Logged In", data: payload})
             } else {
-                response.status(400).json({
-                    message: "Username/Password is incorrect",
-                    status: "Failed Pass Check"
-                })
+                failedRequest(response, "Failed Password Check", "Username/Password Is Incorrect", "Invalid Username/Password")
             }
         } else {
-            response.status(400).json({
-                message: "Username/Password is incorrect",
-                status: "Failed User Check"
-            })
+            failedRequest(response, "Failed Username Check", "Username/Password Is Incorrect", "Invalid Username/Password")
         }
     } catch(error) {
-        response.status(400).json({
-            message: "Failed to Login",
-            error: error
-        })
+        failedRequest(response, "Login Failed", "Failed To Login", {error})
     }
 })
 // Needed: email
