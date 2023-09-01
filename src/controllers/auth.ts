@@ -25,8 +25,6 @@ router.get("/", async (request: express.Request, response: express.Response) => 
         status: "Successfully Reached"
     })
 })
-
-// Needed: 
 /*
 Purpose: Creates a new user
 Needed: name | password | email | username | badgeName
@@ -75,7 +73,6 @@ router.post("/signup", async (request: express.Request, response: express.Respon
         failedRequest(response,"User Creation Failed","Signup Failed", {error} )
     }
 })
-
 /*
 Purpose: Login and user provided cookie
 Needed: username | password
@@ -216,7 +213,10 @@ router.put("/emailupdate/:id", userLoggedIn,  async (request: express.Request, r
         failedRequest(response, "Failed To Locate _ID", "Failed To Update Email", {error})
     }
 })
-
+/*
+Purpose: Clears userToken
+Needed: N/A
+*/
 router.post("/logout", async (request: express.Request, response: express.Response) => {
     response.cookie("token", "", {
       httpOnly: true,
@@ -226,11 +226,14 @@ router.post("/logout", async (request: express.Request, response: express.Respon
       secure: request.hostname === "http://localhost:7777" ? false : true, 
     }).status(200).json({ 
         status: "Successful Logout",
-        message: "Successful Logout"
+        message: "Successful Logout",
+        data: "Token Deleted"
     });
   });
-
-// Needed: Params.id = user._id (to delete) | requestor = requestor._id 
+/*
+Purpose: Deletes User
+Needed: Params.id = user._id (to delete) | requestor = requestor._id 
+*/
 router.delete("/delete/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
     try{
         const possibleAdmin = await UserAccount.findOne({accountID: request.query.requestor})
@@ -238,33 +241,18 @@ router.delete("/delete/:id", userLoggedIn, async (request: express.Request, resp
             if(possibleAdmin.isSiteAdmin) {
                 const deletedUser = await User.findByIdAndDelete(request.params.id)
                 if(deletedUser){
-                    response.status(200).json({
-                        message: "User Successfully Deleted. Remember to remove from all Groups",
-                        data: deletedUser
-                    })
+                    successfulRequest(response, "Successful Request", "User Successfully Deleted. Remember to remove from all Groups", deletedUser)
                 }else {
-                    response.status(400).json({
-                        message: "User Not Found",
-                        status: "_id Not Located"
-                    })
+                    failedRequest(response, "_id Not Located", "User Not Found", "Unable To Find User")
                 }
             } else {
-                response.status(200).json({
-                    status: "User Not Site Admin",
-                    message: "Unable To Delete User"
-                })
+                failedRequest(response, "User Not Site Admin", "Unable To Delete User", "Authorization Error")
             }
         } else {
-            response.status(400).json({
-                status: "Failed To Locate Requestor _id",
-                message: "Failed User Deletion"
-            })
+            failedRequest(response, "Failed To Locate Requestor _id", "Failed User Deletion", "Unable To Locate Requestor")
         }
     } catch(error){
-        response.status(400).json({
-            status: "Failed Delete Request",
-            error: error
-        })
+        failedRequest(response, "Failed Delete Request", "Unable To Delete User", {error})
     }
 })
 

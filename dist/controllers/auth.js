@@ -204,7 +204,8 @@ router.post("/logout", async (request, response) => {
         secure: request.hostname === "http://localhost:7777" ? false : true,
     }).status(200).json({
         status: "Successful Logout",
-        message: "Successful Logout"
+        message: "Successful Logout",
+        data: "Token Deleted"
     });
 });
 router.delete("/delete/:id", UserVerified_1.default, async (request, response) => {
@@ -214,37 +215,22 @@ router.delete("/delete/:id", UserVerified_1.default, async (request, response) =
             if (possibleAdmin.isSiteAdmin) {
                 const deletedUser = await user_1.default.findByIdAndDelete(request.params.id);
                 if (deletedUser) {
-                    response.status(200).json({
-                        message: "User Successfully Deleted. Remember to remove from all Groups",
-                        data: deletedUser
-                    });
+                    (0, SharedFunctions_1.successfulRequest)(response, "Successful Request", "User Successfully Deleted. Remember to remove from all Groups", deletedUser);
                 }
                 else {
-                    response.status(400).json({
-                        message: "User Not Found",
-                        status: "_id Not Located"
-                    });
+                    (0, SharedFunctions_1.failedRequest)(response, "_id Not Located", "User Not Found", "Unable To Find User");
                 }
             }
             else {
-                response.status(200).json({
-                    status: "User Not Site Admin",
-                    message: "Unable To Delete User"
-                });
+                (0, SharedFunctions_1.failedRequest)(response, "User Not Site Admin", "Unable To Delete User", "Authorization Error");
             }
         }
         else {
-            response.status(400).json({
-                status: "Failed To Locate Requestor _id",
-                message: "Failed User Deletion"
-            });
+            (0, SharedFunctions_1.failedRequest)(response, "Failed To Locate Requestor _id", "Failed User Deletion", "Unable To Locate Requestor");
         }
     }
     catch (error) {
-        response.status(400).json({
-            status: "Failed Delete Request",
-            error: error
-        });
+        (0, SharedFunctions_1.failedRequest)(response, "Failed Delete Request", "Unable To Delete User", { error });
     }
 });
 exports.default = router;
