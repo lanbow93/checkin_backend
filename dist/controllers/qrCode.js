@@ -58,7 +58,7 @@ router.put("/generate/:id", UserVerified_1.default, async (request, response) =>
                 try {
                     const newQR = await qrCode_1.default.findByIdAndUpdate(request.params.id, qrObject, { new: true });
                     if (newQR) {
-                        (0, SharedFunctions_1.successfulRequest)(response, "New QR Generated", "New QR Account Generated", newQR);
+                        (0, SharedFunctions_1.successfulRequest)(response, "New QR Generated", "New QR Code Generated", newQR);
                     }
                     else {
                         (0, SharedFunctions_1.failedRequest)(response, "Failed To Get Response Back", "Unable To Update QR", "Unable To Update QR");
@@ -78,6 +78,31 @@ router.put("/generate/:id", UserVerified_1.default, async (request, response) =>
     }
     catch (error) {
         (0, SharedFunctions_1.failedRequest)(response, "Failed QR Generation", "Unable To Generate QR Code", { error });
+    }
+});
+router.get("/verify", UserVerified_1.default, async (request, response) => {
+    try {
+        const qrToCompare = await qrCode_1.default.findOne({
+            group: request.body.groupID,
+            accessCode: request.body.codeToVerify
+        });
+        if (qrToCompare) {
+            const timeDifference = Math.abs(new Date().getTime() - qrToCompare.expiryTime.getTime());
+            const fiveMinutesInMilliseconds = 5 * 60 * 1000;
+            const isMoreThanFiveMinutes = timeDifference > fiveMinutesInMilliseconds;
+            if (!isMoreThanFiveMinutes) {
+                (0, SharedFunctions_1.successfulRequest)(response, "Successful Request", "QR Verified: Proceed To Time Punch", qrToCompare);
+            }
+            else {
+                (0, SharedFunctions_1.failedRequest)(response, "Expiry Token Past 5 Minutes", "Expired Token. Generate New QR And Try Again", "Expired Token");
+            }
+        }
+        else {
+            (0, SharedFunctions_1.failedRequest)(response, "Failed To Find By Group ID && Access Code", "Unable To Verify QR", "QR Find Failed");
+        }
+    }
+    catch (error) {
+        (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate QR", "Unable To Verify: Try Again", { error });
     }
 });
 router.delete("/:id", UserVerified_1.default, async (request, response) => {

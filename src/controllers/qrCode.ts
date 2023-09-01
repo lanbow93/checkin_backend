@@ -62,7 +62,7 @@ router.put("/generate/:id", userLoggedIn, async (request: express.Request, respo
                 try {
                     const newQR: IQRCode | null = await QRCode.findByIdAndUpdate(request.params.id, qrObject, {new: true})
                     if(newQR){
-                        successfulRequest(response, "New QR Generated", "New QR Account Generated", newQR)
+                        successfulRequest(response, "New QR Generated", "New QR Code Generated", newQR)
                     } else {
                         failedRequest(response, "Failed To Get Response Back", "Unable To Update QR", "Unable To Update QR")
                     }
@@ -79,16 +79,33 @@ router.put("/generate/:id", userLoggedIn, async (request: express.Request, respo
         failedRequest(response, "Failed QR Generation", "Unable To Generate QR Code", {error})
     }
 })
-
 /* 
 Purpose: Verify Scanned QR and send success or fail
-NEED TO COMPLETE NEW SCHEDULE GENERATION FIRST
+Needed:  groupID = group_id | codeToVerify = accessCode
 /
 */
-// router.get("/verify", userLoggedIn, async (request: express.Request, response: express.Response) => {
-
-// })
-
+router.get("/verify", userLoggedIn, async (request: express.Request, response: express.Response) => {
+    try{
+        const qrToCompare: IQRCodeObject | null = await QRCode.findOne({
+            group: request.body.groupID,
+            accessCode: request.body.codeToVerify
+        })
+        if(qrToCompare){
+            const timeDifference = Math.abs(new Date().getTime() - qrToCompare.expiryTime.getTime() ); // Difference in milliseconds
+            const fiveMinutesInMilliseconds = 5 * 60 * 1000; // 5 minutes in milliseconds
+            const isMoreThanFiveMinutes = timeDifference > fiveMinutesInMilliseconds;
+            if(!isMoreThanFiveMinutes){
+                successfulRequest(response, "Successful Request", "QR Verified: Proceed To Time Punch", qrToCompare)                
+            }else {
+                failedRequest(response, "Expiry Token Past 5 Minutes", "Expired Token. Generate New QR And Try Again", "Expired Token")
+            }
+        } else {
+            failedRequest(response, "Failed To Find By Group ID && Access Code", "Unable To Verify QR", "QR Find Failed")
+        }
+    }catch(error) {
+        failedRequest(response, "Unable To Locate QR", "Unable To Verify: Try Again", {error})
+    }
+})
 /*
 Purpose: Used to delete a QR Document
 Needed: Params.id = QR._id |  Query.requestorID = user._id
