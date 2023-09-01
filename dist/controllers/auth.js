@@ -146,42 +146,26 @@ router.put("/forgotpassword/:id", async (request, response) => {
                     request.body.password = await bcryptjs_1.default.hash(request.body.password, await bcryptjs_1.default.genSalt(10));
                     user.password = request.body.password;
                     const newUser = await user_1.default.findOneAndUpdate({ username: request.body.username }, user);
-                    response.status(200).json({
-                        message: "Password Updated Successfully",
-                        status: "Successful Reset",
-                        data: newUser
-                    });
+                    (0, SharedFunctions_1.successfulRequest)(response, "Successful Reset", "Password Updated Successfully", { newUser });
                 }
                 else {
                     user.resetToken = "";
                     await user_1.default.findOneAndUpdate({ username: request.body.username }, user);
-                    response.status(400).json({
-                        message: "Failed Password Reset",
-                        status: "resetToken Expired"
-                    });
+                    (0, SharedFunctions_1.failedRequest)(response, "resetToken Expired", "Failed Password Reset", "Past Expiration");
                 }
             }
             else {
                 user.resetToken = "";
                 await user_1.default.findOneAndUpdate({ username: request.body.username }, user);
-                response.status(400).json({
-                    message: "Failed Password Reset",
-                    status: "Failed To Verify resetToken"
-                });
+                (0, SharedFunctions_1.failedRequest)(response, "Failed To Verify resetToken", "Failed Password Reset", "resetToken Doesn't Match");
             }
         }
         else {
-            response.status(400).json({
-                message: "Failed To Find User",
-                status: "Username Lookup Failed"
-            });
+            (0, SharedFunctions_1.failedRequest)(response, "Username Lookup Failed", "Failed To Find User", "Unable To Find User");
         }
     }
     catch (error) {
-        response.status(400).json({
-            message: "Failed To Update Password",
-            error: error
-        });
+        (0, SharedFunctions_1.failedRequest)(response, "Failed To Update Password", "Failed To Update Password", { error });
     }
 });
 router.put("/emailupdate/:id", UserVerified_1.default, async (request, response) => {

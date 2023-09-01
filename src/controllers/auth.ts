@@ -151,7 +151,10 @@ router.put("/forgotpassword", async (request: express.Request, response: express
         failedRequest(response, "Email Does Not Exist", "Unable To Locate Email", {error})
     }
 })
-//Needed: Params.id = resetToken string | username | password
+/*
+Purpose: Login and user provided cookie
+Needed: Params.id = resetToken string | username | password
+*/
 router.put("/forgotpassword/:id", async (request: express.Request, response: express.Response) => {
     try {
         const user = await User.findOne({username: request.body.username})
@@ -166,40 +169,24 @@ router.put("/forgotpassword/:id", async (request: express.Request, response: exp
                     request.body.password = await bcrypt.hash(request.body.password, await bcrypt.genSalt(10))
                     user.password = request.body.password
                     const newUser = await User.findOneAndUpdate({username: request.body.username}, user)
-                    response.status(200).json({
-                        message: "Password Updated Successfully",
-                        status: "Successful Reset",
-                        data: newUser
-                    })
+                    successfulRequest(response, "Successful Reset", "Password Updated Successfully", {newUser})
                 } else {
                     // Clears token after failed verification attempt
                     user.resetToken = ""
                     await User.findOneAndUpdate({username: request.body.username}, user)
-                    response.status(400).json({
-                        message: "Failed Password Reset",
-                        status: "resetToken Expired"
-                    })
+                    failedRequest(response, "resetToken Expired", "Failed Password Reset", "Past Expiration")
                 }
             } else {
                 // Clears token after failed verification attempt
                 user.resetToken = ""
                 await User.findOneAndUpdate({username: request.body.username}, user)
-                response.status(400).json({
-                    message: "Failed Password Reset",
-                    status: "Failed To Verify resetToken"
-                })
+                failedRequest(response, "Failed To Verify resetToken", "Failed Password Reset", "resetToken Doesn't Match")
             }
         } else {
-            response.status(400).json({
-                message: "Failed To Find User",
-                status: "Username Lookup Failed"
-            })
+            failedRequest(response, "Username Lookup Failed", "Failed To Find User", "Unable To Find User")
         }
     }catch (error){
-        response.status(400).json({
-            message: "Failed To Update Password",
-            error: error
-        })
+        failedRequest(response, "Failed To Update Password", "Failed To Update Password", {error})
     }
 })
 //Needed: Params.id = user._id | password | new Email
