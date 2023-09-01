@@ -177,37 +177,22 @@ router.put("/emailupdate/:id", UserVerified_1.default, async (request, response)
                 user.email = request.body.email.toLowerCase();
                 const newUser = await user_1.default.findByIdAndUpdate(request.params.id, user, { new: true });
                 if (newUser) {
-                    response.status(200).json({
-                        message: "Email Update Successful",
-                        data: newUser
-                    });
+                    (0, SharedFunctions_1.successfulRequest)(response, "Update Successful", "Email Update Successful", newUser);
                 }
                 else {
-                    response.status(400).json({
-                        message: "Failed To Update Email",
-                        status: "User Found, Failed To Update Email"
-                    });
+                    (0, SharedFunctions_1.failedRequest)(response, "User Found, Failed To Update Email", "Failed To Update Email", "User Located Unable To Update");
                 }
             }
             else {
-                response.status(400).json({
-                    message: "Failed To Update Email: Password Incorrect",
-                    status: "Incorrect Password"
-                });
+                (0, SharedFunctions_1.failedRequest)(response, "Incorrect Password", "Failed To Update Email: Password Incorrect", "Password Error");
             }
         }
         else {
-            response.status(400).json({
-                message: "Failed To Update Email",
-                status: "_ID Match Failed"
-            });
+            (0, SharedFunctions_1.failedRequest)(response, "_ID Match Failed", "Failed To Update Email", "Email Update Failed: _ID Match");
         }
     }
     catch (error) {
-        response.status(400).json({
-            message: "Failed To Update Email",
-            status: "Failed To Locate _ID"
-        });
+        (0, SharedFunctions_1.failedRequest)(response, "Failed To Locate _ID", "Failed To Update Email", { error });
     }
 });
 router.post("/logout", async (request, response) => {

@@ -109,7 +109,7 @@ router.post("/login", async(request: express.Request, response: express.Response
     }
 })
 /*
-Purpose: Login and user provided cookie
+Purpose: Generate random string && Update Token And Time
 Needed: email
 */
 router.put("/forgotpassword", async (request: express.Request, response: express.Response) => {
@@ -152,7 +152,7 @@ router.put("/forgotpassword", async (request: express.Request, response: express
     }
 })
 /*
-Purpose: Login and user provided cookie
+Purpose: Verifies string and updates password
 Needed: Params.id = resetToken string | username | password
 */
 router.put("/forgotpassword/:id", async (request: express.Request, response: express.Response) => {
@@ -189,7 +189,10 @@ router.put("/forgotpassword/:id", async (request: express.Request, response: exp
         failedRequest(response, "Failed To Update Password", "Failed To Update Password", {error})
     }
 })
-//Needed: Params.id = user._id | password | new Email
+/*
+Purpose: Update Email After Accepting Password On File
+Needed: Params.id = user._id | password | new Email
+*/
 router.put("/emailupdate/:id", userLoggedIn,  async (request: express.Request, response: express.Response) => {
     try{
         const user = await User.findById(request.params.id)
@@ -199,33 +202,18 @@ router.put("/emailupdate/:id", userLoggedIn,  async (request: express.Request, r
                 user.email = request.body.email.toLowerCase()
                 const newUser = await User.findByIdAndUpdate(request.params.id, user, { new: true })
                 if(newUser){
-                    response.status(200).json({
-                        message: "Email Update Successful",
-                        data: newUser
-                    })
+                    successfulRequest(response, "Update Successful", "Email Update Successful", newUser)
                 } else {
-                    response.status(400).json({
-                        message: "Failed To Update Email",
-                        status: "User Found, Failed To Update Email"
-                    })
+                    failedRequest(response, "User Found, Failed To Update Email", "Failed To Update Email", "User Located Unable To Update")
                 }
             } else {
-                response.status(400).json({
-                    message: "Failed To Update Email: Password Incorrect",
-                    status: "Incorrect Password"
-                })
+                failedRequest(response, "Incorrect Password", "Failed To Update Email: Password Incorrect", "Password Error")
             }
         } else{
-            response.status(400).json({
-                message: "Failed To Update Email",
-                status: "_ID Match Failed"
-            })
+            failedRequest(response, "_ID Match Failed", "Failed To Update Email", "Email Update Failed: _ID Match")
         }
     }catch(error){
-        response.status(400).json({
-            message: "Failed To Update Email",
-            status: "Failed To Locate _ID"
-        })
+        failedRequest(response, "Failed To Locate _ID", "Failed To Update Email", {error})
     }
 })
 
