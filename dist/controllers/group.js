@@ -9,15 +9,6 @@ const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
 const userAccount_1 = __importDefault(require("../models/userAccount"));
 const SharedFunctions_1 = require("../utils/SharedFunctions");
 const router = express_1.default.Router();
-router.get("/", async (request, response) => {
-    const groupDate = group_1.default.find({});
-    console.log({ groupDate });
-    console.log(request.body);
-    response.status(200).json({
-        page: "GroupRouter",
-        status: "Successfully Reached"
-    });
-});
 router.post("/new", UserVerified_1.default, async (request, response) => {
     try {
         const userAccount = await userAccount_1.default.findOne({ accountID: request.body.userID });

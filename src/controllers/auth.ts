@@ -17,14 +17,6 @@ dotenv.config()
 const router: express.Router = express.Router()
 const SECRET: string = process.env.SECRET || ""
 
-// Test Route
-router.get("/", async (request: express.Request, response: express.Response) => {
-    console.log(request.body)
-    response.status(200).json({
-        page: "AuthRouter",
-        status: "Successfully Reached"
-    })
-})
 /*
 Purpose: Creates a new user
 Needed: name | password | email | username | badgeName

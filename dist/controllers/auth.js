@@ -16,13 +16,6 @@ const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
 dotenv_1.default.config();
 const router = express_1.default.Router();
 const SECRET = process.env.SECRET || "";
-router.get("/", async (request, response) => {
-    console.log(request.body);
-    response.status(200).json({
-        page: "AuthRouter",
-        status: "Successfully Reached"
-    });
-});
 router.post("/signup", async (request, response) => {
     try {
         request.body.name = request.body.name.toLowerCase().replace(/(?:^|\s|')\w/g, (m) => m.toUpperCase());

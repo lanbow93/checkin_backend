@@ -19,5 +19,6 @@ router.get("/", async (request, response) => {
         });
     }
 });
+router.get("/edit:id");
 exports.default = router;
 //# sourceMappingURL=userAccount.js.map

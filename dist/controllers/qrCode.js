@@ -9,15 +9,6 @@ const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
 const crypto_1 = __importDefault(require("crypto"));
 const SharedFunctions_1 = require("../utils/SharedFunctions");
 const router = express_1.default.Router();
-router.get("/", async (request, response) => {
-    const qrData = await qrCode_1.default.find({});
-    console.log(qrData);
-    console.log(request.body);
-    response.status(200).json({
-        page: "QRRouter",
-        status: "Reached Successfully"
-    });
-});
 router.post("/new", UserVerified_1.default, async (request, response) => {
     try {
         const newQR = {

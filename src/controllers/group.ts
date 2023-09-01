@@ -8,16 +8,6 @@ import { successfulRequest, failedRequest } from "../utils/SharedFunctions"
 
 const router: express.Router = express.Router()
 
-router.get("/", async(request: express.Request, response: express.Response) => {
-    const groupDate = Group.find({})
-    console.log({groupDate})
-    console.log(request.body)
-    response.status(200).json({
-        page: "GroupRouter",
-        status: "Successfully Reached"
-    })
-})
-
 /*
 Purpose: Creates a New Group, Adds User As Member && Admin | Updates userAccount with Member & Admin 
 Needed: groupName = passed groupName | userID  = user._id

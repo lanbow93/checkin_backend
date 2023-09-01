@@ -7,15 +7,6 @@ import { successfulRequest, failedRequest } from "../utils/SharedFunctions";
 
 const router: express.Router = express.Router()
 
-router.get("/", async(request: express.Request, response: express.Response) => {
-    const qrData = await QRCode.find({})
-    console.log(qrData)
-    console.log(request.body)
-    response.status(200).json({
-        page: "QRRouter",
-        status: "Reached Successfully"
-    })
-})
 /* 
 Purpose: Generate a new QR Document
 Needed: groupID = Group._id QR is for | adminID = user._id
