@@ -63,7 +63,7 @@ router.put("/updatedetails/:id", async (request: express.Request, response: expr
                     isScheduleAdmin: oldAccount.isScheduleAdmin
                 }
                 try{
-                    const updatedAccount: IUserAccountObject | null = await UserAccount.findByIdAndUpdate(request.params.id, newAccount)
+                    const updatedAccount: IUserAccountObject | null = await UserAccount.findByIdAndUpdate(request.params.id, newAccount, {new: true})
                     if(updatedAccount){
                         successfulRequest(response, "Successful Update", "Account Update Successful", updatedAccount)
                     }else {
