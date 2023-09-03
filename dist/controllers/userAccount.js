@@ -40,5 +40,6 @@ router.get("/edit/:id", UserVerified_1.default, async (request, response) => {
         (0, SharedFunctions_1.failedRequest)(response, "Unable To Retrieve UserAccount", "Unable To Retrieve Account", { error });
     }
 });
+router.put("/updatedetails/:id");
 exports.default = router;
 //# sourceMappingURL=userAccount.js.map
