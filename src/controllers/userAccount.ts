@@ -7,19 +7,6 @@ import mongoose from "mongoose";
 import Group from "../models/group";
 const router: express.Router = express.Router()
 
-
-router.get("/", async(request: express.Request, response: express.Response) => {
-    try {
-        request.body.name = "Test"
-        const userAccounts = await UserAccount.find({})
-        response.status(200).json({userAccounts})
-    } catch(error) {
-        response.status(400).json({
-            status: "Unable To Locate Any UserAccounts",
-            error: error
-        })
-    }
-})
 /*
 Purpose: Get's User Specific Account Information
 Needed: Params.id = user._id | requestorID = user._id

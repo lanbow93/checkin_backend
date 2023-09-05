@@ -54,6 +54,7 @@ router.post("/signup", async (request: express.Request, response: express.Respon
                 isGroupAdmin: false,
                 isScheduleAdmin: false
             }
+            
             try{
                 const newUserAccount = await UserAccount.create(userAccountDetails)
                 successfulRequest(response, "Successful User Creation", "New User Created", {user: user, accountData: newUserAccount})
