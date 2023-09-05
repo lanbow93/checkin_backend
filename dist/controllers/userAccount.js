@@ -91,12 +91,39 @@ router.put("/task/:id", UserVerified_1.default, async (request, response) => {
     try {
         const userAccountToCompare = await userAccount_1.default.findById(request.params.id);
         if (userAccountToCompare) {
-            console.log("reached");
+            let isRequestorAdmin = false;
             const groupsToCheck = await group_1.default.find({
                 '_id': { $in: userAccountToCompare.groupNames.map((group_id) => new mongoose_1.default.Types.ObjectId(group_id)) }
             });
-            console.log({ groupsToCheck });
-            response.json(groupsToCheck);
+            if (groupsToCheck && groupsToCheck.length > 0) {
+                for (let i = 0; i < groupsToCheck.length; i++) {
+                    if (groupsToCheck[i].admins.includes(request.body.requestorID)) {
+                        isRequestorAdmin = true;
+                        break;
+                    }
+                }
+                if (isRequestorAdmin) {
+                    userAccountToCompare.currentTask = [request.body.task || "Off Duty", request.body.requestorID];
+                    try {
+                        const newUserAccount = await userAccount_1.default.findByIdAndUpdate(request.params.id, userAccountToCompare, { new: true });
+                        if (newUserAccount) {
+                            (0, SharedFunctions_1.successfulRequest)(response, "Successful Update", "Task Has Been Successfully Assigned", newUserAccount);
+                        }
+                        else {
+                            (0, SharedFunctions_1.failedRequest)(response, "Failed To Update Task", "Unable To Update", "Unknown Error");
+                        }
+                    }
+                    catch (error) {
+                        (0, SharedFunctions_1.failedRequest)(response, "Failed To Update", "Unable To Update User", { error });
+                    }
+                }
+                else {
+                    (0, SharedFunctions_1.failedRequest)(response, "User Not Admin", "Failed To Verify Admin", "Authorization: No Admin Listed");
+                }
+            }
+            else {
+                (0, SharedFunctions_1.failedRequest)(response, "Failed To Locate By Group._ID(s)", "Unable To Locate User's Groups", "Not Found: User Groups");
+            }
         }
         else {
             (0, SharedFunctions_1.failedRequest)(response, "Failed To Locate UserAccount._id", "Failed To Update: Unable To Locate User", "Find Error");

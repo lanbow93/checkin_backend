@@ -2,7 +2,7 @@ import express from "express";
 import UserAccount from "../models/userAccount";
 import userLoggedIn from "../utils/UserVerified";
 import { failedRequest, successfulRequest } from "../utils/SharedFunctions";
-import { IUserAccount, IUserAccountObject } from "../utils/InterfacesUsed";
+import { IGroup, IUserAccount, IUserAccountObject } from "../utils/InterfacesUsed";
 import mongoose from "mongoose";
 import Group from "../models/group";
 const router: express.Router = express.Router()
@@ -86,19 +86,43 @@ router.put("/updatedetails/:id", userLoggedIn, async (request: express.Request, 
 })
 /*
 Purpose: Updates The User Task
-Needed: Params.id = UserAccount._id To Search| requestorID = user_id
+Needed: Params.id = UserAccount._id To Search | requestorID = user_id | task = New Assigned Task 
 */
 router.put("/task/:id",userLoggedIn, async (request: express.Request, response: express.Response) => {
     try{
         const userAccountToCompare: IUserAccountObject | null = await UserAccount.findById(request.params.id)
         if(userAccountToCompare){
-            console.log("reached")
-            const groupsToCheck = await Group.find({
+            let isRequestorAdmin: boolean = false
+
+            const groupsToCheck: IGroup[] | null = await Group.find({
                 '_id': { $in: userAccountToCompare.groupNames.map((group_id) => new mongoose.Types.ObjectId(group_id))}
             })
-            console.log({groupsToCheck})
-            response.json(groupsToCheck)
+            if(groupsToCheck && groupsToCheck.length > 0){
+                for(let i=0; i<groupsToCheck.length; i++){
+                    if(groupsToCheck[i].admins.includes(request.body.requestorID)){
+                        isRequestorAdmin = true
+                        break
+                    }
+                }
+                if(isRequestorAdmin){
+                    userAccountToCompare.currentTask = [request.body.task || "Off Duty", request.body.requestorID]
+                    try{
+                        const newUserAccount: IUserAccountObject | null = await UserAccount.findByIdAndUpdate(request.params.id, userAccountToCompare, {new: true})
+                        if(newUserAccount){
+                            successfulRequest(response, "Successful Update", "Task Has Been Successfully Assigned", newUserAccount)
+                        }else {
+                            failedRequest(response, "Failed To Update Task", "Unable To Update", "Unknown Error")
+                        }
+                    } catch(error){
+                        failedRequest(response, "Failed To Update", "Unable To Update User", {error})
+                    }
+                }else {
+                    failedRequest(response, "User Not Admin", "Failed To Verify Admin", "Authorization: No Admin Listed")
+                }
 
+            }else {
+                failedRequest(response, "Failed To Locate By Group._ID(s)", "Unable To Locate User's Groups", "Not Found: User Groups")
+            }
         }else {
             failedRequest(response, "Failed To Locate UserAccount._id", "Failed To Update: Unable To Locate User", "Find Error")
         }
