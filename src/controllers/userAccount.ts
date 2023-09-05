@@ -3,6 +3,8 @@ import UserAccount from "../models/userAccount";
 import userLoggedIn from "../utils/UserVerified";
 import { failedRequest, successfulRequest } from "../utils/SharedFunctions";
 import { IUserAccount, IUserAccountObject } from "../utils/InterfacesUsed";
+import mongoose from "mongoose";
+import Group from "../models/group";
 const router: express.Router = express.Router()
 
 
@@ -40,9 +42,9 @@ router.get("/edit/:id", userLoggedIn, async (request: express.Request, response:
 })
 /*
 Purpose: Updates The User Details
-Needed: Params.id = group_id | requestorID = user_id
+Needed: Params.id = UserAccount._id | requestorID = user_id
 */ 
-router.put("/updatedetails/:id", async (request: express.Request, response: express.Response) => {
+router.put("/updatedetails/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
     try{
         const oldAccount: IUserAccountObject | null = await UserAccount.findById(request.params.id)
         if(oldAccount){
@@ -82,6 +84,29 @@ router.put("/updatedetails/:id", async (request: express.Request, response: expr
         failedRequest(response, "Unable To Retrieve Record", "Failed To Update Account", {error})
     }
 })
+/*
+Purpose: Updates The User Task
+Needed: Params.id = UserAccount._id To Search| requestorID = user_id
+*/
+router.put("/task/:id",userLoggedIn, async (request: express.Request, response: express.Response) => {
+    try{
+        const userAccountToCompare: IUserAccountObject | null = await UserAccount.findById(request.params.id)
+        if(userAccountToCompare){
+            console.log("reached")
+            const groupsToCheck = await Group.find({
+                '_id': { $in: userAccountToCompare.groupNames.map((group_id) => new mongoose.Types.ObjectId(group_id))}
+            })
+            console.log({groupsToCheck})
+            response.json(groupsToCheck)
+
+        }else {
+            failedRequest(response, "Failed To Locate UserAccount._id", "Failed To Update: Unable To Locate User", "Find Error")
+        }
+    }catch(error){
+        failedRequest(response, "Failed Task Update", "Unable To Update User's Task", {error})
+    }
+})
+
 
 
 export default router

@@ -7,6 +7,8 @@ const express_1 = __importDefault(require("express"));
 const userAccount_1 = __importDefault(require("../models/userAccount"));
 const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
 const SharedFunctions_1 = require("../utils/SharedFunctions");
+const mongoose_1 = __importDefault(require("mongoose"));
+const group_1 = __importDefault(require("../models/group"));
 const router = express_1.default.Router();
 router.get("/", async (request, response) => {
     try {
@@ -40,7 +42,7 @@ router.get("/edit/:id", UserVerified_1.default, async (request, response) => {
         (0, SharedFunctions_1.failedRequest)(response, "Unable To Retrieve UserAccount", "Unable To Retrieve Account", { error });
     }
 });
-router.put("/updatedetails/:id", async (request, response) => {
+router.put("/updatedetails/:id", UserVerified_1.default, async (request, response) => {
     try {
         const oldAccount = await userAccount_1.default.findById(request.params.id);
         if (oldAccount) {
@@ -83,6 +85,25 @@ router.put("/updatedetails/:id", async (request, response) => {
     }
     catch (error) {
         (0, SharedFunctions_1.failedRequest)(response, "Unable To Retrieve Record", "Failed To Update Account", { error });
+    }
+});
+router.put("/task/:id", UserVerified_1.default, async (request, response) => {
+    try {
+        const userAccountToCompare = await userAccount_1.default.findById(request.params.id);
+        if (userAccountToCompare) {
+            console.log("reached");
+            const groupsToCheck = await group_1.default.find({
+                '_id': { $in: userAccountToCompare.groupNames.map((group_id) => new mongoose_1.default.Types.ObjectId(group_id)) }
+            });
+            console.log({ groupsToCheck });
+            response.json(groupsToCheck);
+        }
+        else {
+            (0, SharedFunctions_1.failedRequest)(response, "Failed To Locate UserAccount._id", "Failed To Update: Unable To Locate User", "Find Error");
+        }
+    }
+    catch (error) {
+        (0, SharedFunctions_1.failedRequest)(response, "Failed Task Update", "Unable To Update User's Task", { error });
     }
 });
 exports.default = router;
