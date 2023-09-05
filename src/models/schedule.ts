@@ -6,8 +6,8 @@ const {Schema, model} = mongoose
 const scheduleSchema = new Schema<ISchedule>({
     user: {type: String, unique: true},
     group: String,
-    assignedClockIn: [Date],
-    assignedClockOut: [Date],
+    assignedClockIn: [[Date, String]],
+    assignedClockOut: [[Date, String]],
     userPunchIn: [[Date, String]],
     userPunchOut: [[Date, String]]
 }, {timestamps: true})

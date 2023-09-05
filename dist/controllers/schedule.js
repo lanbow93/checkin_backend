@@ -15,5 +15,6 @@ router.get("/", async (request, response) => {
         status: "Successfully Reached"
     });
 });
+router.post("/new");
 exports.default = router;
 //# sourceMappingURL=schedule.js.map

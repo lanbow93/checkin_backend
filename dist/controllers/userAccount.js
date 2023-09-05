@@ -10,19 +10,6 @@ const SharedFunctions_1 = require("../utils/SharedFunctions");
 const mongoose_1 = __importDefault(require("mongoose"));
 const group_1 = __importDefault(require("../models/group"));
 const router = express_1.default.Router();
-router.get("/", async (request, response) => {
-    try {
-        request.body.name = "Test";
-        const userAccounts = await userAccount_1.default.find({});
-        response.status(200).json({ userAccounts });
-    }
-    catch (error) {
-        response.status(400).json({
-            status: "Unable To Locate Any UserAccounts",
-            error: error
-        });
-    }
-});
 router.get("/edit/:id", UserVerified_1.default, async (request, response) => {
     try {
         const userAccount = await userAccount_1.default.findOne({ accountID: request.params.id });
