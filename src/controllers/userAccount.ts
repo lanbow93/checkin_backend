@@ -93,7 +93,6 @@ router.put("/task/:id",userLoggedIn, async (request: express.Request, response: 
         const userAccountToCompare: IUserAccountObject | null = await UserAccount.findById(request.params.id)
         if(userAccountToCompare){
             let isRequestorAdmin: boolean = false
-
             const groupsToCheck: IGroup[] | null = await Group.find({
                 '_id': { $in: userAccountToCompare.groupNames.map((group_id) => new mongoose.Types.ObjectId(group_id))}
             })
@@ -119,7 +118,6 @@ router.put("/task/:id",userLoggedIn, async (request: express.Request, response: 
                 }else {
                     failedRequest(response, "User Not Admin", "Failed To Verify Admin", "Authorization: No Admin Listed")
                 }
-
             }else {
                 failedRequest(response, "Failed To Locate By Group._ID(s)", "Unable To Locate User's Groups", "Not Found: User Groups")
             }
