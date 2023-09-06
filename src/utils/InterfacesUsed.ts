@@ -33,10 +33,10 @@ export interface IGroup {
 export interface ISchedule {
     user: string,
     group: string,
-    assignedClockIn: Array<[scheduledDate: Date, adminBadgeName: string]>,
-    assignedClockOut: Array<[scheduledDate: Date, adminBadgeName: string]>,
-    userPunchIn: Array<[currentDate: Date, QRBadgeName: string ]>,
-    userPunchOut: Array<[currentDate: Date, QRBadgeName: string ]>,
+    assignedClockIn: Array<[scheduledDate: string, adminBadgeName: string]>,
+    assignedClockOut: Array<[scheduledDate: string, adminBadgeName: string]>,
+    userPunchIn: Array<[currentDate: string, QRBadgeName: string ]>,
+    userPunchOut: Array<[currentDate: string, QRBadgeName: string ]>,
 }
 
 export interface IQRCode {

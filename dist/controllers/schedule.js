@@ -5,6 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const schedule_1 = __importDefault(require("../models/schedule"));
+const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
+const SharedFunctions_1 = require("../utils/SharedFunctions");
+const userAccount_1 = __importDefault(require("../models/userAccount"));
 const router = express_1.default.Router();
 router.get("/", async (request, response) => {
     const scheduleInfo = await schedule_1.default.find({});
@@ -15,6 +18,44 @@ router.get("/", async (request, response) => {
         status: "Successfully Reached"
     });
 });
-router.post("/new");
+router.post("/new", UserVerified_1.default, async (request, response) => {
+    const userID = request.body.userID;
+    const requestorID = request.body.requestorID;
+    const groupID = request.body.groupID;
+    try {
+        const adminUserAccount = await userAccount_1.default.findOne({ accountID: requestorID });
+        if (adminUserAccount) {
+            const clockInTimes = request.body.clockInTimes.map((item) => [item, adminUserAccount.badgeName]);
+            const clockOutTimes = request.body.clockOutTimes.map((item) => [item, adminUserAccount.badgeName]);
+            console.log(clockInTimes);
+            if (adminUserAccount.adminOf.includes(groupID)) {
+                const newSchedule = {
+                    user: userID,
+                    group: groupID,
+                    assignedClockIn: clockInTimes,
+                    assignedClockOut: clockOutTimes,
+                    userPunchIn: [],
+                    userPunchOut: []
+                };
+                const createdSchedule = await schedule_1.default.create(newSchedule);
+                if (createdSchedule) {
+                    (0, SharedFunctions_1.successfulRequest)(response, "Successful Schedule Creation", `New Schedule Was Created`, createdSchedule);
+                }
+                else {
+                    (0, SharedFunctions_1.failedRequest)(response, "Failed To Make Schedule", "Unable To Create Schedule", "Unknown");
+                }
+            }
+            else {
+                (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Group In Admin List", "Unable To Update: Not Authorized", "Authorization: Admin");
+            }
+        }
+        else {
+            (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Requestor's Account", "Unable To Update Schedule", "Find Error: Requestor");
+        }
+    }
+    catch (error) {
+        (0, SharedFunctions_1.failedRequest)(response, "Failed Schedule Creation", "Unable To Create Schedule", { error });
+    }
+});
 exports.default = router;
 //# sourceMappingURL=schedule.js.map

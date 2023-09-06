@@ -4,14 +4,16 @@ import { ISchedule } from "../utils/InterfacesUsed";
 const {Schema, model} = mongoose
 
 const scheduleSchema = new Schema<ISchedule>({
-    user: {type: String, unique: true},
+    user: String,
     group: String,
-    assignedClockIn: [[Date, String]],
-    assignedClockOut: [[Date, String]],
-    userPunchIn: [[Date, String]],
-    userPunchOut: [[Date, String]]
-}, {timestamps: true})
+    assignedClockIn: [[String, String]],
+    assignedClockOut: [[String, String]],
+    userPunchIn: [[String, String]],
+    userPunchOut: [[String, String]]
+}, 
+{timestamps: true})
 
+scheduleSchema.index({user: 1, group: 1}, {unique: true})
 const Schedule = model("Schedule", scheduleSchema)
 
 export default Schedule

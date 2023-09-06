@@ -6,13 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const connection_1 = __importDefault(require("../db/connection"));
 const { Schema, model } = connection_1.default;
 const scheduleSchema = new Schema({
-    user: { type: String, unique: true },
+    user: String,
     group: String,
-    assignedClockIn: [Date],
-    assignedClockOut: [Date],
-    userPunchIn: [[Date, String]],
-    userPunchOut: [[Date, String]]
+    assignedClockIn: [[String, String]],
+    assignedClockOut: [[String, String]],
+    userPunchIn: [[String, String]],
+    userPunchOut: [[String, String]]
 }, { timestamps: true });
+scheduleSchema.index({ user: 1, group: 1 }, { unique: true });
 const Schedule = model("Schedule", scheduleSchema);
 exports.default = Schedule;
 //# sourceMappingURL=schedule.js.map
