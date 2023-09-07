@@ -1,6 +1,6 @@
 import express from "express";
 import Schedule from "../models/schedule";
-import { ISchedule, IUserAccount } from "../utils/InterfacesUsed";
+import { ISchedule, IScheduleRequest, IUserAccount } from "../utils/InterfacesUsed";
 import userLoggedIn from "../utils/UserVerified";
 import { failedRequest, successfulRequest } from "../utils/SharedFunctions";
 import UserAccount from "../models/userAccount";
@@ -24,8 +24,47 @@ router.get("/", userLoggedIn, async(request: express.Request, response: express.
         failedRequest(response, "Failed To Retrieve Schedule", "Unable To Get Schedule", {error})
     }
 })
-
-
+/*
+Purpose: View Schedule(s) From User Perspective
+Needed: Query.targetUserID = user._id | Query.targetGroupID = group._id | Query.requestorID = requesor._id
+*/
+router.get("/admin", userLoggedIn, async (request: IScheduleRequest, response: express.Response) => {
+    const userID: string = request.query.targetUserID
+    const groupID: string = request.query.targetGroupID
+    const requestorID: string = request.query.requestorID
+    try{
+        const adminUserAccount: IUserAccount | null = await UserAccount.findOne({accountID: requestorID})
+        if(adminUserAccount){
+            const clockInTimes:  ISchedule["assignedClockIn"]= request.body.clockInTimes.map((item: string) => [item, adminUserAccount.badgeName])
+            const clockOutTimes: ISchedule["assignedClockOut"] = request.body.clockOutTimes.map((item: string) => [item, adminUserAccount.badgeName])
+            if(adminUserAccount.adminOf.includes(groupID)){
+                const oldSchedule: ISchedule | null = await Schedule.findOne({user: userID, group: groupID})
+                if(oldSchedule){
+                    oldSchedule.assignedClockIn = oldSchedule.assignedClockIn.concat(clockInTimes)
+                    oldSchedule.assignedClockOut= oldSchedule.assignedClockOut.concat(clockOutTimes)
+                    try{
+                        const newSchedule: ISchedule | null = await Schedule.findOneAndUpdate({user: userID, group: groupID}, oldSchedule, {new: true})
+                        if(newSchedule){
+                            successfulRequest(response, "Successful Update", "New Schedule Has Been Recorded", newSchedule)
+                        } else {
+                            failedRequest(response, "Failed To Update Schedule", "Unable To Update User's Schedule", "Schedule Did Not Overrite")
+                        }
+                    }catch(error) {
+                        failedRequest(response, "Failed Put Request", "Unable To Update Schedule", {error})
+                    }
+                } else{
+                    failedRequest(response, "Unable To Find Old Schedule", "Failed To Update Schedule", "Find: Old Schedule")
+                }
+            } else {
+                failedRequest(response, "Unable To Locate Group In Admin List", "Unable To Update: Not Authorized", "Authorization: Admin")
+            }
+        }else {
+            failedRequest(response, "Unable To Locate Requestor's Account", "Unable To Update Schedule", "Find Error: Requestor")
+        }
+    }catch(error){
+        failedRequest(response, "Failed Schedule Creation", "Unable To Create Schedule", {error})
+    }
+})
 /*
 Purpose: Create New User Schedule For Group
 Needed: userID = user._id | requestorID = user._id | groupID = Group For Schedule |  clockInTimes = Array Of ClockIn Dates | clockOutTimes = Array Of ClockOut Dates

@@ -82,3 +82,14 @@ export interface IGroupObject extends IGroup{
 export interface IUserRequestVerification extends express.Request {
     payload: jwt.JwtPayload | string
 }
+
+type IScheduleQueryParams = {
+    targetUserID: string,
+    targetGroupID: string,
+    requestorID: string,
+    
+}
+
+export interface IScheduleRequest extends express.Request {
+    query: IScheduleQueryParams
+}
