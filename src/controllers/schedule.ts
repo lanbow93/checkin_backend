@@ -1,13 +1,11 @@
 import express from "express";
 import Schedule from "../models/schedule";
-import { ISchedule, IScheduleRequest, IUserAccount } from "../utils/InterfacesUsed";
+import { ISchedule, IScheduleQuery, IScheduleRequest, IUserAccount } from "../utils/InterfacesUsed";
 import userLoggedIn from "../utils/UserVerified";
 import { failedRequest, successfulRequest } from "../utils/SharedFunctions";
 import UserAccount from "../models/userAccount";
 
 const router: express.Router = express.Router()
-
-
 /*
 Purpose: View Schedule(s) From User Perspective
 Needed: Query.targetUserID = user._id | Query.targetGroupID = group._id
@@ -26,25 +24,39 @@ router.get("/", userLoggedIn, async(request: express.Request, response: express.
 })
 /*
 Purpose: View Schedule(s) From User Perspective
-Needed: Query.targetUserID = user._id | Query.targetGroupID = group._id | Query.requestorID = requesor._id
+Needed:  Query.requestorID = requesor._id
+Optional: Query.targetGroupID = group._id | Query.targetUserID = user._id 
 */
 router.get("/admin", userLoggedIn, async (request: IScheduleRequest, response: express.Response) => {
-    const userID: string = request.query.targetUserID
-    const groupID: string = request.query.targetGroupID
-    const requestorID: string = request.query.requestorID
+    const userID: string = request.query.targetUserID || ""
+    const groupID: string = request.query.targetGroupID || ""
+    const requestorID: string = request.query.requestorID 
     try{
         const adminUserAccount: IUserAccount | null = await UserAccount.findOne({accountID: requestorID})
         if(adminUserAccount){
             if(adminUserAccount.adminOf.includes(groupID) || adminUserAccount.isSiteAdmin || adminUserAccount.isScheduleAdmin){
-                const schedule: ISchedule = await 
+                let scheduleQuery: IScheduleQuery = {}
+                if(groupID){
+                    scheduleQuery.group = groupID
+                }
+                if(userID && groupID || userID && (adminUserAccount.isSiteAdmin || adminUserAccount.isScheduleAdmin)){
+                    scheduleQuery.user = userID
+                }
+                console.log(scheduleQuery)
+                const schedule: ISchedule[] | null = await Schedule.find(scheduleQuery)
+                if(schedule.length > 0){
+                    successfulRequest(response, "Successful Schedule Fetch", "Success", schedule)
+                }else {
+                    failedRequest(response, "Failed To Locate By Find", "No Schedules Exist With Those Parameters", "Find Error: Not Found")
+                }
             } else {
-                failedRequest(response, "Unable To Locate Group In Admin List", "Unable To Update: Not Authorized", "Authorization: Admin")
+                failedRequest(response, "Unable To Locate Group In Admin List", "Unable To Find: Not Authorized", "Authorization: Admin")
             }
         }else {
             failedRequest(response, "Unable To Locate Requestor's Account", "Unable To View Schedule", "Find Error: Requestor")
         }
     }catch(error){
-        failedRequest(response, "Failed Schedule Creation", "Unable To View Schedule", {error})
+        failedRequest(response, "Failed Schedule Search", "Unable To View Schedule", {error})
     }
 })
 /*

@@ -93,3 +93,8 @@ type IScheduleQueryParams = {
 export interface IScheduleRequest extends express.Request {
     query: IScheduleQueryParams
 }
+
+export interface IScheduleQuery {
+    group ?: string,
+    user ?: string,
+}

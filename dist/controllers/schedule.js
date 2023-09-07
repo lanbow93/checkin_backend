@@ -24,46 +24,39 @@ router.get("/", UserVerified_1.default, async (request, response) => {
     }
 });
 router.get("/admin", UserVerified_1.default, async (request, response) => {
-    const userID = request.query.targetUserID;
-    const groupID = request.query.targetGroupID;
+    const userID = request.query.targetUserID || "";
+    const groupID = request.query.targetGroupID || "";
     const requestorID = request.query.requestorID;
     try {
         const adminUserAccount = await userAccount_1.default.findOne({ accountID: requestorID });
         if (adminUserAccount) {
-            const clockInTimes = request.body.clockInTimes.map((item) => [item, adminUserAccount.badgeName]);
-            const clockOutTimes = request.body.clockOutTimes.map((item) => [item, adminUserAccount.badgeName]);
-            if (adminUserAccount.adminOf.includes(groupID)) {
-                const oldSchedule = await schedule_1.default.findOne({ user: userID, group: groupID });
-                if (oldSchedule) {
-                    oldSchedule.assignedClockIn = oldSchedule.assignedClockIn.concat(clockInTimes);
-                    oldSchedule.assignedClockOut = oldSchedule.assignedClockOut.concat(clockOutTimes);
-                    try {
-                        const newSchedule = await schedule_1.default.findOneAndUpdate({ user: userID, group: groupID }, oldSchedule, { new: true });
-                        if (newSchedule) {
-                            (0, SharedFunctions_1.successfulRequest)(response, "Successful Update", "New Schedule Has Been Recorded", newSchedule);
-                        }
-                        else {
-                            (0, SharedFunctions_1.failedRequest)(response, "Failed To Update Schedule", "Unable To Update User's Schedule", "Schedule Did Not Overrite");
-                        }
-                    }
-                    catch (error) {
-                        (0, SharedFunctions_1.failedRequest)(response, "Failed Put Request", "Unable To Update Schedule", { error });
-                    }
+            if (adminUserAccount.adminOf.includes(groupID) || adminUserAccount.isSiteAdmin || adminUserAccount.isScheduleAdmin) {
+                let scheduleQuery = {};
+                if (groupID) {
+                    scheduleQuery.group = groupID;
+                }
+                if (userID && groupID || userID && (adminUserAccount.isSiteAdmin || adminUserAccount.isScheduleAdmin)) {
+                    scheduleQuery.user = userID;
+                }
+                console.log(scheduleQuery);
+                const schedule = await schedule_1.default.find(scheduleQuery);
+                if (schedule.length > 0) {
+                    (0, SharedFunctions_1.successfulRequest)(response, "Successful Schedule Fetch", "Success", schedule);
                 }
                 else {
-                    (0, SharedFunctions_1.failedRequest)(response, "Unable To Find Old Schedule", "Failed To Update Schedule", "Find: Old Schedule");
+                    (0, SharedFunctions_1.failedRequest)(response, "Failed To Locate By Find", "No Schedules Exist With Those Parameters", "Find Error: Not Found");
                 }
             }
             else {
-                (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Group In Admin List", "Unable To Update: Not Authorized", "Authorization: Admin");
+                (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Group In Admin List", "Unable To Find: Not Authorized", "Authorization: Admin");
             }
         }
         else {
-            (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Requestor's Account", "Unable To Update Schedule", "Find Error: Requestor");
+            (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Requestor's Account", "Unable To View Schedule", "Find Error: Requestor");
         }
     }
     catch (error) {
-        (0, SharedFunctions_1.failedRequest)(response, "Failed Schedule Creation", "Unable To Create Schedule", { error });
+        (0, SharedFunctions_1.failedRequest)(response, "Failed Schedule Search", "Unable To View Schedule", { error });
     }
 });
 router.post("/new", UserVerified_1.default, async (request, response) => {
@@ -75,7 +68,7 @@ router.post("/new", UserVerified_1.default, async (request, response) => {
         if (adminUserAccount) {
             const clockInTimes = request.body.clockInTimes.map((item) => [item, adminUserAccount.badgeName]);
             const clockOutTimes = request.body.clockOutTimes.map((item) => [item, adminUserAccount.badgeName]);
-            if (adminUserAccount.adminOf.includes(groupID)) {
+            if (adminUserAccount.adminOf.includes(groupID) || adminUserAccount.isSiteAdmin || adminUserAccount.isScheduleAdmin) {
                 const newSchedule = {
                     user: userID,
                     group: groupID,
@@ -113,7 +106,7 @@ router.put("/addschedule", UserVerified_1.default, async (request, response) => 
         if (adminUserAccount) {
             const clockInTimes = request.body.clockInTimes.map((item) => [item, adminUserAccount.badgeName]);
             const clockOutTimes = request.body.clockOutTimes.map((item) => [item, adminUserAccount.badgeName]);
-            if (adminUserAccount.adminOf.includes(groupID)) {
+            if (adminUserAccount.adminOf.includes(groupID) || adminUserAccount.isSiteAdmin || adminUserAccount.isScheduleAdmin) {
                 const oldSchedule = await schedule_1.default.findOne({ user: userID, group: groupID });
                 if (oldSchedule) {
                     oldSchedule.assignedClockIn = oldSchedule.assignedClockIn.concat(clockInTimes);
