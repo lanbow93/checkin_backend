@@ -35,34 +35,16 @@ router.get("/admin", userLoggedIn, async (request: IScheduleRequest, response: e
     try{
         const adminUserAccount: IUserAccount | null = await UserAccount.findOne({accountID: requestorID})
         if(adminUserAccount){
-            const clockInTimes:  ISchedule["assignedClockIn"]= request.body.clockInTimes.map((item: string) => [item, adminUserAccount.badgeName])
-            const clockOutTimes: ISchedule["assignedClockOut"] = request.body.clockOutTimes.map((item: string) => [item, adminUserAccount.badgeName])
-            if(adminUserAccount.adminOf.includes(groupID)){
-                const oldSchedule: ISchedule | null = await Schedule.findOne({user: userID, group: groupID})
-                if(oldSchedule){
-                    oldSchedule.assignedClockIn = oldSchedule.assignedClockIn.concat(clockInTimes)
-                    oldSchedule.assignedClockOut= oldSchedule.assignedClockOut.concat(clockOutTimes)
-                    try{
-                        const newSchedule: ISchedule | null = await Schedule.findOneAndUpdate({user: userID, group: groupID}, oldSchedule, {new: true})
-                        if(newSchedule){
-                            successfulRequest(response, "Successful Update", "New Schedule Has Been Recorded", newSchedule)
-                        } else {
-                            failedRequest(response, "Failed To Update Schedule", "Unable To Update User's Schedule", "Schedule Did Not Overrite")
-                        }
-                    }catch(error) {
-                        failedRequest(response, "Failed Put Request", "Unable To Update Schedule", {error})
-                    }
-                } else{
-                    failedRequest(response, "Unable To Find Old Schedule", "Failed To Update Schedule", "Find: Old Schedule")
-                }
+            if(adminUserAccount.adminOf.includes(groupID) || adminUserAccount.isSiteAdmin || adminUserAccount.isScheduleAdmin){
+                const schedule: ISchedule = await 
             } else {
                 failedRequest(response, "Unable To Locate Group In Admin List", "Unable To Update: Not Authorized", "Authorization: Admin")
             }
         }else {
-            failedRequest(response, "Unable To Locate Requestor's Account", "Unable To Update Schedule", "Find Error: Requestor")
+            failedRequest(response, "Unable To Locate Requestor's Account", "Unable To View Schedule", "Find Error: Requestor")
         }
     }catch(error){
-        failedRequest(response, "Failed Schedule Creation", "Unable To Create Schedule", {error})
+        failedRequest(response, "Failed Schedule Creation", "Unable To View Schedule", {error})
     }
 })
 /*
@@ -78,7 +60,7 @@ router.post("/new", userLoggedIn, async(request: express.Request, response: expr
         if(adminUserAccount){
             const clockInTimes:  ISchedule["assignedClockIn"]= request.body.clockInTimes.map((item: string) => [item, adminUserAccount.badgeName])
             const clockOutTimes: ISchedule["assignedClockOut"] = request.body.clockOutTimes.map((item: string) => [item, adminUserAccount.badgeName])
-            if(adminUserAccount.adminOf.includes(groupID)){
+            if(adminUserAccount.adminOf.includes(groupID) || adminUserAccount.isSiteAdmin || adminUserAccount.isScheduleAdmin){
                 const newSchedule: ISchedule = {
                     user: userID,
                     group: groupID,
@@ -116,7 +98,7 @@ router.put("/addschedule", userLoggedIn, async(request: express.Request, respons
         if(adminUserAccount){
             const clockInTimes:  ISchedule["assignedClockIn"]= request.body.clockInTimes.map((item: string) => [item, adminUserAccount.badgeName])
             const clockOutTimes: ISchedule["assignedClockOut"] = request.body.clockOutTimes.map((item: string) => [item, adminUserAccount.badgeName])
-            if(adminUserAccount.adminOf.includes(groupID)){
+            if(adminUserAccount.adminOf.includes(groupID) || adminUserAccount.isSiteAdmin || adminUserAccount.isScheduleAdmin){
                 const oldSchedule: ISchedule | null = await Schedule.findOne({user: userID, group: groupID})
                 if(oldSchedule){
                     oldSchedule.assignedClockIn = oldSchedule.assignedClockIn.concat(clockInTimes)
