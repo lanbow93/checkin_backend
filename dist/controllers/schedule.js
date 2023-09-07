@@ -27,7 +27,6 @@ router.post("/new", UserVerified_1.default, async (request, response) => {
         if (adminUserAccount) {
             const clockInTimes = request.body.clockInTimes.map((item) => [item, adminUserAccount.badgeName]);
             const clockOutTimes = request.body.clockOutTimes.map((item) => [item, adminUserAccount.badgeName]);
-            console.log(clockInTimes);
             if (adminUserAccount.adminOf.includes(groupID)) {
                 const newSchedule = {
                     user: userID,
@@ -43,6 +42,49 @@ router.post("/new", UserVerified_1.default, async (request, response) => {
                 }
                 else {
                     (0, SharedFunctions_1.failedRequest)(response, "Failed To Make Schedule", "Unable To Create Schedule", "Unknown");
+                }
+            }
+            else {
+                (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Group In Admin List", "Unable To Update: Not Authorized", "Authorization: Admin");
+            }
+        }
+        else {
+            (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Requestor's Account", "Unable To Update Schedule", "Find Error: Requestor");
+        }
+    }
+    catch (error) {
+        (0, SharedFunctions_1.failedRequest)(response, "Failed Schedule Creation", "Unable To Create Schedule", { error });
+    }
+});
+router.put("/addschedule", UserVerified_1.default, async (request, response) => {
+    const userID = request.body.userID;
+    const requestorID = request.body.requestorID;
+    const groupID = request.body.groupID;
+    try {
+        const adminUserAccount = await userAccount_1.default.findOne({ accountID: requestorID });
+        if (adminUserAccount) {
+            const clockInTimes = request.body.clockInTimes.map((item) => [item, adminUserAccount.badgeName]);
+            const clockOutTimes = request.body.clockOutTimes.map((item) => [item, adminUserAccount.badgeName]);
+            if (adminUserAccount.adminOf.includes(groupID)) {
+                const oldSchedule = await schedule_1.default.findOne({ user: userID, group: groupID });
+                if (oldSchedule) {
+                    oldSchedule.assignedClockIn = oldSchedule.assignedClockIn.concat(clockInTimes);
+                    oldSchedule.assignedClockOut = oldSchedule.assignedClockOut.concat(clockOutTimes);
+                    try {
+                        const newSchedule = await schedule_1.default.findOneAndUpdate({ user: userID, group: groupID }, oldSchedule, { new: true });
+                        if (newSchedule) {
+                            (0, SharedFunctions_1.successfulRequest)(response, "Successful Update", "New Schedule Has Been Recorded", newSchedule);
+                        }
+                        else {
+                            (0, SharedFunctions_1.failedRequest)(response, "Failed To Update Schedule", "Unable To Update User's Schedule", "Schedule Did Not Overrite");
+                        }
+                    }
+                    catch (error) {
+                        (0, SharedFunctions_1.failedRequest)(response, "Failed Put Request", "Unable To Update Schedule", { error });
+                    }
+                }
+                else {
+                    (0, SharedFunctions_1.failedRequest)(response, "Unable To Find Old Schedule", "Failed To Update Schedule", "Find: Old Schedule");
                 }
             }
             else {
