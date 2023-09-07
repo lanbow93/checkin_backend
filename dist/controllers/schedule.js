@@ -9,14 +9,19 @@ const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
 const SharedFunctions_1 = require("../utils/SharedFunctions");
 const userAccount_1 = __importDefault(require("../models/userAccount"));
 const router = express_1.default.Router();
-router.get("/", async (request, response) => {
-    const scheduleInfo = await schedule_1.default.find({});
-    console.log(scheduleInfo);
-    console.log(request.body);
-    response.status(200).json({
-        page: "Schedule Router",
-        status: "Successfully Reached"
-    });
+router.get("/", UserVerified_1.default, async (request, response) => {
+    try {
+        const schedule = await schedule_1.default.findOne({ user: request.query.targetUserID, group: request.query.targetGroupID });
+        if (schedule) {
+            (0, SharedFunctions_1.successfulRequest)(response, "Successful Schedule Request", "Successful Retrieval", schedule);
+        }
+        else {
+            (0, SharedFunctions_1.failedRequest)(response, "Schedule Not Found By Parameters", "Unable To Get Schedule", "Find: Schedule Not Found");
+        }
+    }
+    catch (error) {
+        (0, SharedFunctions_1.failedRequest)(response, "Failed To Retrieve Schedule", "Unable To Get Schedule", { error });
+    }
 });
 router.post("/new", UserVerified_1.default, async (request, response) => {
     const userID = request.body.userID;

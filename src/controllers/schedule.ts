@@ -7,15 +7,25 @@ import UserAccount from "../models/userAccount";
 
 const router: express.Router = express.Router()
 
-router.get("/", async(request: express.Request, response: express.Response) => {
-    const scheduleInfo = await Schedule.find({})
-    console.log(scheduleInfo)
-    console.log(request.body)
-    response.status(200).json({
-        page: "Schedule Router",
-        status: "Successfully Reached"
-    })
+
+/*
+Purpose: View Schedule(s) From User Perspective
+Needed: Query.targetUserID = user._id | Query.targetGroupID = group._id
+*/
+router.get("/", userLoggedIn, async(request: express.Request, response: express.Response) => {
+    try{
+        const schedule: ISchedule | null = await Schedule.findOne({user: request.query.targetUserID, group: request.query.targetGroupID})
+        if(schedule){
+            successfulRequest(response, "Successful Schedule Request", "Successful Retrieval", schedule)
+        }else{
+            failedRequest(response, "Schedule Not Found By Parameters", "Unable To Get Schedule", "Find: Schedule Not Found")
+        }
+    }catch(error){
+        failedRequest(response, "Failed To Retrieve Schedule", "Unable To Get Schedule", {error})
+    }
 })
+
+
 /*
 Purpose: Create New User Schedule For Group
 Needed: userID = user._id | requestorID = user._id | groupID = Group For Schedule |  clockInTimes = Array Of ClockIn Dates | clockOutTimes = Array Of ClockOut Dates
@@ -95,5 +105,6 @@ router.put("/addschedule", userLoggedIn, async(request: express.Request, respons
         failedRequest(response, "Failed Schedule Creation", "Unable To Create Schedule", {error})
     }
 })
+
 
 export default router
