@@ -169,9 +169,11 @@ router.put("/update/:id", userLoggedIn, async (request: express.Request, respons
 Purpose: Adds In Punch In Or Out
 Needed: cookie = QRToken | 
 */
-router.put("/statusverifiedin", userLoggedIn, qrVerified, async(request: express.Request, response: express.Response) => {
+router.put("/verifiedpunch", userLoggedIn, qrVerified, async(request: express.Request, response: express.Response) => {
+    
     try {
-        (request.body)
+        const cookieData: any = request.cookies.QRToken
+        console.log(cookieData)
     }catch(error){
         failedRequest(response, "Failed To Check In", "Unable To Check In", {error})
     }

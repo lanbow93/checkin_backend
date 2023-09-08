@@ -86,5 +86,5 @@ An easy application to check in employees at a kiosk area and validate attendanc
 | /schedule | /:id | GET | View Schedule |  userToken <sub>(ScheduleAdminGroup-AdminOfGroup-SpecifiedUser)<sub> |
 | /schedule | /admin | GET | View Schedule To Edit |  userToken <sub>(ScheduleAdminGroup SiteAdmin GroupAdmin)<sub> |
 | /schedule | /update/:id | POST | Edit Schedule |  userToken <sub>(ScheduleAdminGroup)<sub> |
-| /schedule | /statusverifiedin | PUT | Adds Punch In/Out   |  N/A |
+| /schedule | /verifiedpunch | PUT | Adds Punch In/Out   |  N/A |
 
