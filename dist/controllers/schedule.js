@@ -164,5 +164,13 @@ router.put("/update/:id", UserVerified_1.userLoggedIn, async (request, response)
         (0, SharedFunctions_1.failedRequest)(response, "Unable To Update Schedule", "Failed To Update", { error });
     }
 });
+router.put("/statusverifiedin", UserVerified_1.userLoggedIn, UserVerified_1.qrVerified, async (request, response) => {
+    try {
+        (request.body);
+    }
+    catch (error) {
+        (0, SharedFunctions_1.failedRequest)(response, "Failed To Check In", "Unable To Check In", { error });
+    }
+});
 exports.default = router;
 //# sourceMappingURL=schedule.js.map

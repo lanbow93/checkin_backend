@@ -3,9 +3,10 @@ import crypto from "crypto"
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import QRCode from "../models/qrCode";
-import { IQRCode, IQRCodeObject } from "../utils/InterfacesUsed";
+import { IQRCode, IQRCodeObject, IUserAccount } from "../utils/InterfacesUsed";
 import {userLoggedIn} from "../utils/UserVerified";
 import { successfulRequest, failedRequest } from "../utils/SharedFunctions";
+import UserAccount from "../models/userAccount";
 dotenv.config()
 const SECRET: string = process.env.VSECRET || ""
 
@@ -89,16 +90,20 @@ router.get("/verify", userLoggedIn, async (request: express.Request, response: e
             const fiveMinutesInMilliseconds = 5 * 60 * 1000; // 5 minutes in milliseconds
             const isMoreThanFiveMinutes = timeDifference > fiveMinutesInMilliseconds;
             if(!isMoreThanFiveMinutes){
-                const payload: object = {group: qrToCompare.group}
-                const QRtoken = await jwt.sign(payload, SECRET)
-                response.status(200).cookie("QRtoken", QRtoken, {
+                const accountForBadgeName: IUserAccount | null = await UserAccount.findOne({accountID: qrToCompare.controllingAdmin})
+                if(accountForBadgeName){
+                    const payload: object = {group: qrToCompare.group, adminBadge: accountForBadgeName.badgeName}
+                    const QRtoken = await jwt.sign(payload, SECRET)
+                    response.status(200).cookie("QRtoken", QRtoken, {
                     httpOnly: true,
                     path:"/",
                     maxAge: 300000,
                     sameSite: "none",
                     secure: request.hostname === "localhost" ? false : true
-                }).json({status: "Logged In", message: "Successfully Logged In", data: payload})
-                // successfulRequest(response, "Successful Request", "QR Verified: Proceed To Time Punch", qrToCompare)                
+                }).json({status: "Logged In", message: "Successfully Logged In", data: payload}) 
+                } else {
+                    failedRequest(response, "Unable To Find Admin Account", "Unable To Verify Admin QR", "Failed To Verify")
+                }        
             }else {
                 failedRequest(response, "Expiry Token Past 5 Minutes", "Expired Token. Generate New QR And Try Again", "Expired Token")
             }

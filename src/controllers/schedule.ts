@@ -1,7 +1,7 @@
 import express from "express";
 import Schedule from "../models/schedule";
 import { ISchedule, IScheduleQuery, IScheduleRequest, IUserAccount } from "../utils/InterfacesUsed";
-import {userLoggedIn} from "../utils/UserVerified";
+import {qrVerified, userLoggedIn} from "../utils/UserVerified";
 import { failedRequest, successfulRequest } from "../utils/SharedFunctions";
 import UserAccount from "../models/userAccount";
 
@@ -167,8 +167,14 @@ router.put("/update/:id", userLoggedIn, async (request: express.Request, respons
 })
 /*
 Purpose: Adds In Punch In Or Out
-Needed: 
+Needed: cookie = QRToken | 
 */
-
+router.put("/statusverifiedin", userLoggedIn, qrVerified, async(request: express.Request, response: express.Response) => {
+    try {
+        (request.body)
+    }catch(error){
+        failedRequest(response, "Failed To Check In", "Unable To Check In", {error})
+    }
+})
 
 export default router

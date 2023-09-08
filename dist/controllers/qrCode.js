@@ -10,6 +10,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const qrCode_1 = __importDefault(require("../models/qrCode"));
 const UserVerified_1 = require("../utils/UserVerified");
 const SharedFunctions_1 = require("../utils/SharedFunctions");
+const userAccount_1 = __importDefault(require("../models/userAccount"));
 dotenv_1.default.config();
 const SECRET = process.env.VSECRET || "";
 const router = express_1.default.Router();
@@ -86,15 +87,21 @@ router.get("/verify", UserVerified_1.userLoggedIn, async (request, response) => 
             const fiveMinutesInMilliseconds = 5 * 60 * 1000;
             const isMoreThanFiveMinutes = timeDifference > fiveMinutesInMilliseconds;
             if (!isMoreThanFiveMinutes) {
-                const payload = { group: qrToCompare.group };
-                const QRtoken = await jsonwebtoken_1.default.sign(payload, SECRET);
-                response.status(200).cookie("QRtoken", QRtoken, {
-                    httpOnly: true,
-                    path: "/",
-                    maxAge: 300000,
-                    sameSite: "none",
-                    secure: request.hostname === "localhost" ? false : true
-                }).json({ status: "Logged In", message: "Successfully Logged In", data: payload });
+                const accountForBadgeName = await userAccount_1.default.findOne({ accountID: qrToCompare.controllingAdmin });
+                if (accountForBadgeName) {
+                    const payload = { group: qrToCompare.group, adminBadge: accountForBadgeName.badgeName };
+                    const QRtoken = await jsonwebtoken_1.default.sign(payload, SECRET);
+                    response.status(200).cookie("QRtoken", QRtoken, {
+                        httpOnly: true,
+                        path: "/",
+                        maxAge: 300000,
+                        sameSite: "none",
+                        secure: request.hostname === "localhost" ? false : true
+                    }).json({ status: "Logged In", message: "Successfully Logged In", data: payload });
+                }
+                else {
+                    (0, SharedFunctions_1.failedRequest)(response, "Unable To Find Admin Account", "Unable To Verify Admin QR", "Failed To Verify");
+                }
             }
             else {
                 (0, SharedFunctions_1.failedRequest)(response, "Expiry Token Past 5 Minutes", "Expired Token. Generate New QR And Try Again", "Expired Token");
