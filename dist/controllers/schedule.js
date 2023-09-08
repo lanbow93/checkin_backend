@@ -140,5 +140,29 @@ router.put("/addschedule", UserVerified_1.default, async (request, response) => 
         (0, SharedFunctions_1.failedRequest)(response, "Failed Schedule Creation", "Unable To Create Schedule", { error });
     }
 });
+router.put("/update/:id", UserVerified_1.default, async (request, response) => {
+    try {
+        const oldSchedule = await schedule_1.default.findById(request.params.id);
+        if (oldSchedule) {
+            oldSchedule.assignedClockIn = request.body.clockInTimes || oldSchedule.assignedClockIn;
+            oldSchedule.assignedClockIn = request.body.clockOutTimes || oldSchedule.assignedClockIn;
+            oldSchedule.userPunchIn = request.body.punchInTimes || oldSchedule.userPunchIn;
+            oldSchedule.userPunchOut = request.body.punchOutTimes || oldSchedule.userPunchOut;
+            const newSchedule = await schedule_1.default.findByIdAndUpdate(request.params.id, oldSchedule, { new: true });
+            if (newSchedule) {
+                (0, SharedFunctions_1.successfulRequest)(response, "Successful Request", "Success", newSchedule);
+            }
+            else {
+                (0, SharedFunctions_1.failedRequest)(response, "Schedule Update Returned Nothing", "Schedule Not Updated", "Find And Update Step Failed");
+            }
+        }
+        else {
+            (0, SharedFunctions_1.failedRequest)(response, "Failed To Locate Previous Schedule", "Unable To Update Schedule", "Find: Schedule._id");
+        }
+    }
+    catch (error) {
+        (0, SharedFunctions_1.failedRequest)(response, "Unable To Update Schedule", "Failed To Update", { error });
+    }
+});
 exports.default = router;
 //# sourceMappingURL=schedule.js.map

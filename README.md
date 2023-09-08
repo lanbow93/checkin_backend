@@ -81,10 +81,10 @@ An easy application to check in employees at a kiosk area and validate attendanc
 | /useraccount | /updatedetails/:id | PUT | Update Account Details <sub>(User Request)</sub> |  userToken |
 | /useraccount | /task/:id | PUT | Update Task |  userToken <sub>{Admin Of Group}</sub> |
 |  |  |  |  |  |
-| /schedule | /new | POST | Creates Blank Schedule For User <sub>(InternalRequest)</sub> |  N/A |
+| /schedule | /new | POST | Creates Blank Schedule For User  |  N/A |
 | /schedule | /addschedule | PUT | Adds New Dates To Schedule |  userToken <sub>(AdminOfGroup)</sub> |
 | /schedule | /:id | GET | View Schedule |  userToken <sub>(ScheduleAdminGroup-AdminOfGroup-SpecifiedUser)<sub> |
-| /schedule | /edit/:id | GET | View Schedule To Edit |  userToken <sub>(ScheduleAdminGroup)<sub> |
+| /schedule | /admin | GET | View Schedule To Edit |  userToken <sub>(ScheduleAdminGroup SiteAdmin GroupAdmin)<sub> |
 | /schedule | /update/:id | POST | Edit Schedule |  userToken <sub>(ScheduleAdminGroup)<sub> |
 | /schedule | /statusverifiedin | PUT | Adds Punch In/Out   |  N/A |
 

@@ -139,5 +139,32 @@ router.put("/addschedule", userLoggedIn, async(request: express.Request, respons
     }
 })
 
+/*
+Purpose: Manual Update To User Schedule 
+Needed: Params.id = schedule._id | requestorID = user._id | clockInTimes = Array Of ClockIn Dates | clockOutTimes = Array Of ClockOut Dates | punchInTimes = Array Of Punch In Times | punchOutTimes
+*/
+router.put("/update/:id", userLoggedIn, async (request: express.Request, response: express.Response) => {
+    try{
+        const oldSchedule: ISchedule | null = await Schedule.findById(request.params.id) 
+        if(oldSchedule){
+            oldSchedule.assignedClockIn = request.body.clockInTimes || oldSchedule.assignedClockIn
+            oldSchedule.assignedClockIn = request.body.clockOutTimes || oldSchedule.assignedClockIn
+            oldSchedule.userPunchIn = request.body.punchInTimes || oldSchedule.userPunchIn
+            oldSchedule.userPunchOut = request.body.punchOutTimes || oldSchedule.userPunchOut
+            
+            const newSchedule: ISchedule | null = await Schedule.findByIdAndUpdate(request.params.id, oldSchedule, {new: true})
+            if(newSchedule){
+                successfulRequest(response, "Successful Request", "Success", newSchedule)
+            }else {
+                failedRequest(response, "Schedule Update Returned Nothing", "Schedule Not Updated", "Find And Update Step Failed")
+            }
+        }else {
+            failedRequest(response, "Failed To Locate Previous Schedule", "Unable To Update Schedule", "Find: Schedule._id")
+        }
+    }catch(error){
+        failedRequest(response, "Unable To Update Schedule", "Failed To Update", {error})
+    }
+})
+
 
 export default router
