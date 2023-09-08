@@ -6,8 +6,6 @@ dotenv.config()
 const SECRET = process.env.SECRET || ""
 const VSECRET = process.env.VSECRET || ""
 
-
-
 export async function userLoggedIn  (request: any, response: Response, next: NextFunction){
     try {
         // Check if token is in the cookies

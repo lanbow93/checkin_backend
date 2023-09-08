@@ -1,5 +1,6 @@
 import express from "express";
 import Schedule from "../models/schedule";
+import jwt from "jsonwebtoken";
 import { ISchedule, IScheduleQuery, IScheduleRequest, IUserAccount } from "../utils/InterfacesUsed";
 import {qrVerified, userLoggedIn} from "../utils/UserVerified";
 import { failedRequest, successfulRequest } from "../utils/SharedFunctions";
@@ -167,13 +168,29 @@ router.put("/update/:id", userLoggedIn, async (request: express.Request, respons
 })
 /*
 Purpose: Adds In Punch In Or Out
-Needed: cookie = QRToken | 
+Needed: cookie = QRToken | userID = user._id
 */
+
 router.put("/verifiedpunch", userLoggedIn, qrVerified, async(request: express.Request, response: express.Response) => {
-    
     try {
-        const cookieData: any = request.cookies.QRToken
-        console.log(cookieData)
+        const cookieData: any = jwt.decode(request.cookies.QRtoken)
+        const oldSchedule: ISchedule | null = await Schedule.findOne({accountID: request.body.userID,  group: cookieData.group})
+        const date = new Date().toISOString()
+        if(oldSchedule){
+            if(oldSchedule.userPunchIn.length > oldSchedule.userPunchOut.length){
+                oldSchedule.userPunchOut.push([date, cookieData.adminBadge])
+            }else{
+                oldSchedule.userPunchIn.push([date, cookieData.adminBadge])
+            }
+            const newSchedule: ISchedule | null = await Schedule.findOneAndUpdate({accountID: request.body.userID}, oldSchedule, {new: true})
+            if(newSchedule){
+                successfulRequest(response, "Success", "Successfully Logged Time", newSchedule )
+            }else {
+                failedRequest(response, "Update Request Failed", "Time Log Not Successful", "Unknown")
+            }
+        }else {
+            failedRequest(response, "Unable To Locate Old Schedule", "Punch Not Successful", "Find: Old Schedule" )
+        }
     }catch(error){
         failedRequest(response, "Failed To Check In", "Unable To Check In", {error})
     }

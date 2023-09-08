@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const schedule_1 = __importDefault(require("../models/schedule"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const UserVerified_1 = require("../utils/UserVerified");
 const SharedFunctions_1 = require("../utils/SharedFunctions");
 const userAccount_1 = __importDefault(require("../models/userAccount"));
@@ -166,8 +167,27 @@ router.put("/update/:id", UserVerified_1.userLoggedIn, async (request, response)
 });
 router.put("/verifiedpunch", UserVerified_1.userLoggedIn, UserVerified_1.qrVerified, async (request, response) => {
     try {
-        const cookieData = request.cookies.QRToken;
-        console.log(cookieData);
+        const cookieData = jsonwebtoken_1.default.decode(request.cookies.QRtoken);
+        const oldSchedule = await schedule_1.default.findOne({ accountID: request.body.userID, group: cookieData.group });
+        const date = new Date().toISOString();
+        if (oldSchedule) {
+            if (oldSchedule.userPunchIn.length > oldSchedule.userPunchOut.length) {
+                oldSchedule.userPunchOut.push([date, cookieData.adminBadge]);
+            }
+            else {
+                oldSchedule.userPunchIn.push([date, cookieData.adminBadge]);
+            }
+            const newSchedule = await schedule_1.default.findOneAndUpdate({ accountID: request.body.userID }, oldSchedule, { new: true });
+            if (newSchedule) {
+                (0, SharedFunctions_1.successfulRequest)(response, "Success", "Successfully Logged Time", newSchedule);
+            }
+            else {
+                (0, SharedFunctions_1.failedRequest)(response, "Update Request Failed", "Time Log Not Successful", "Unknown");
+            }
+        }
+        else {
+            (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Old Schedule", "Punch Not Successful", "Find: Old Schedule");
+        }
     }
     catch (error) {
         (0, SharedFunctions_1.failedRequest)(response, "Failed To Check In", "Unable To Check In", { error });
