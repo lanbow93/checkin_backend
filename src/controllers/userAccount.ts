@@ -1,6 +1,6 @@
 import express from "express";
 import UserAccount from "../models/userAccount";
-import userLoggedIn from "../utils/UserVerified";
+import {userLoggedIn} from "../utils/UserVerified";
 import { failedRequest, successfulRequest } from "../utils/SharedFunctions";
 import { IGroup, IUserAccount, IUserAccountObject } from "../utils/InterfacesUsed";
 import mongoose from "mongoose";

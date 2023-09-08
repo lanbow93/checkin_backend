@@ -7,7 +7,7 @@ const SECRET = process.env.SECRET || ""
 
 
 
-async function userLoggedIn  (request: any, response: Response, next: NextFunction){
+export async function userLoggedIn  (request: any, response: Response, next: NextFunction){
     try {
         // Check if token is in the cookies
         const { token = false} = request.cookies;
@@ -27,4 +27,3 @@ async function userLoggedIn  (request: any, response: Response, next: NextFuncti
         })
     }
 }
-export default userLoggedIn

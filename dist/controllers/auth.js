@@ -12,7 +12,7 @@ const crypto_1 = __importDefault(require("crypto"));
 const user_1 = __importDefault(require("../models/user"));
 const SharedFunctions_1 = require("../utils/SharedFunctions");
 const userAccount_1 = __importDefault(require("../models/userAccount"));
-const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
+const UserVerified_1 = require("../utils/UserVerified");
 dotenv_1.default.config();
 const router = express_1.default.Router();
 const SECRET = process.env.SECRET || "";
@@ -161,7 +161,7 @@ router.put("/forgotpassword/:id", async (request, response) => {
         (0, SharedFunctions_1.failedRequest)(response, "Failed To Update Password", "Failed To Update Password", { error });
     }
 });
-router.put("/emailupdate/:id", UserVerified_1.default, async (request, response) => {
+router.put("/emailupdate/:id", UserVerified_1.userLoggedIn, async (request, response) => {
     try {
         const user = await user_1.default.findById(request.params.id);
         if (user) {
@@ -201,7 +201,7 @@ router.post("/logout", async (request, response) => {
         data: "Token Deleted"
     });
 });
-router.delete("/delete/:id", UserVerified_1.default, async (request, response) => {
+router.delete("/delete/:id", UserVerified_1.userLoggedIn, async (request, response) => {
     try {
         const possibleAdmin = await userAccount_1.default.findOne({ accountID: request.query.requestor });
         if (possibleAdmin) {

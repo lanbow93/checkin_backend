@@ -1,7 +1,7 @@
 import express from "express"
 import Group from "../models/group"
-import userLoggedIn from "../utils/UserVerified"
 import UserAccount from "../models/userAccount"
+import {userLoggedIn} from "../utils/UserVerified"
 import { IGroup, IGroupObject, IUserAccount, IUserAccountObject } from "../utils/InterfacesUsed"
 import { Types } from "mongoose"
 import { successfulRequest, failedRequest } from "../utils/SharedFunctions"

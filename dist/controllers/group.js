@@ -5,11 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const group_1 = __importDefault(require("../models/group"));
-const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
 const userAccount_1 = __importDefault(require("../models/userAccount"));
+const UserVerified_1 = require("../utils/UserVerified");
 const SharedFunctions_1 = require("../utils/SharedFunctions");
 const router = express_1.default.Router();
-router.post("/new", UserVerified_1.default, async (request, response) => {
+router.post("/new", UserVerified_1.userLoggedIn, async (request, response) => {
     try {
         const userAccount = await userAccount_1.default.findOne({ accountID: request.body.userID });
         if (userAccount) {
@@ -42,7 +42,7 @@ router.post("/new", UserVerified_1.default, async (request, response) => {
         (0, SharedFunctions_1.failedRequest)(response, "Failed To Create Group", "Group Creation Failed", "Unable To Create Group: Unknown");
     }
 });
-router.get("/:id", UserVerified_1.default, async (request, response) => {
+router.get("/:id", UserVerified_1.userLoggedIn, async (request, response) => {
     try {
         const group = await group_1.default.findById(request.params.id);
         if (group) {
@@ -58,7 +58,7 @@ router.get("/:id", UserVerified_1.default, async (request, response) => {
         (0, SharedFunctions_1.failedRequest)(response, "Failed To Locate Group._ID", "Unable To View Group", { error });
     }
 });
-router.put("/editmembers/:id", UserVerified_1.default, async (request, response) => {
+router.put("/editmembers/:id", UserVerified_1.userLoggedIn, async (request, response) => {
     const submittedGroup = request.body.groupUserArray;
     try {
         const group = await group_1.default.findById(request.params.id);
@@ -110,7 +110,7 @@ router.put("/editmembers/:id", UserVerified_1.default, async (request, response)
         (0, SharedFunctions_1.failedRequest)(response, "Failed Group Update", "Failed To Update Members", { error });
     }
 });
-router.put("/editadmins/:id", UserVerified_1.default, async (request, response) => {
+router.put("/editadmins/:id", UserVerified_1.userLoggedIn, async (request, response) => {
     const submittedGroup = request.body.adminUserArray;
     try {
         const group = await group_1.default.findById(request.params.id);
@@ -165,7 +165,7 @@ router.put("/editadmins/:id", UserVerified_1.default, async (request, response) 
         (0, SharedFunctions_1.failedRequest)(response, "Failed Admin Update", "Unable To Update Admin List", { error });
     }
 });
-router.delete("/:id", UserVerified_1.default, async (request, response) => {
+router.delete("/:id", UserVerified_1.userLoggedIn, async (request, response) => {
     const requestorID = request.query.requestorID?.toString() || "";
     try {
         const groupToDelete = await group_1.default.findById(request.params.id);

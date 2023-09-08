@@ -4,12 +4,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const qrCode_1 = __importDefault(require("../models/qrCode"));
-const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
 const crypto_1 = __importDefault(require("crypto"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const qrCode_1 = __importDefault(require("../models/qrCode"));
+const UserVerified_1 = require("../utils/UserVerified");
 const SharedFunctions_1 = require("../utils/SharedFunctions");
+dotenv_1.default.config();
+const SECRET = process.env.VSECRET || "";
 const router = express_1.default.Router();
-router.post("/new", UserVerified_1.default, async (request, response) => {
+router.post("/new", UserVerified_1.userLoggedIn, async (request, response) => {
     try {
         const newQR = {
             accessCode: "",
@@ -38,7 +42,7 @@ router.post("/new", UserVerified_1.default, async (request, response) => {
         (0, SharedFunctions_1.failedRequest)(response, "Failed To Create", "Unable To Create QR", { error });
     }
 });
-router.put("/generate/:id", UserVerified_1.default, async (request, response) => {
+router.put("/generate/:id", UserVerified_1.userLoggedIn, async (request, response) => {
     try {
         const qrString = crypto_1.default.randomBytes(32).toString("hex");
         const qrObject = await qrCode_1.default.findById(request.params.id);
@@ -71,7 +75,7 @@ router.put("/generate/:id", UserVerified_1.default, async (request, response) =>
         (0, SharedFunctions_1.failedRequest)(response, "Failed QR Generation", "Unable To Generate QR Code", { error });
     }
 });
-router.get("/verify", UserVerified_1.default, async (request, response) => {
+router.get("/verify", UserVerified_1.userLoggedIn, async (request, response) => {
     try {
         const qrToCompare = await qrCode_1.default.findOne({
             group: request.body.groupID,
@@ -82,7 +86,15 @@ router.get("/verify", UserVerified_1.default, async (request, response) => {
             const fiveMinutesInMilliseconds = 5 * 60 * 1000;
             const isMoreThanFiveMinutes = timeDifference > fiveMinutesInMilliseconds;
             if (!isMoreThanFiveMinutes) {
-                (0, SharedFunctions_1.successfulRequest)(response, "Successful Request", "QR Verified: Proceed To Time Punch", qrToCompare);
+                const payload = { group: qrToCompare.group };
+                const QRtoken = await jsonwebtoken_1.default.sign(payload, SECRET);
+                response.status(200).cookie("QRtoken", QRtoken, {
+                    httpOnly: true,
+                    path: "/",
+                    maxAge: 300000,
+                    sameSite: "none",
+                    secure: request.hostname === "localhost" ? false : true
+                }).json({ status: "Logged In", message: "Successfully Logged In", data: payload });
             }
             else {
                 (0, SharedFunctions_1.failedRequest)(response, "Expiry Token Past 5 Minutes", "Expired Token. Generate New QR And Try Again", "Expired Token");
@@ -96,7 +108,7 @@ router.get("/verify", UserVerified_1.default, async (request, response) => {
         (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate QR", "Unable To Verify: Try Again", { error });
     }
 });
-router.delete("/:id", UserVerified_1.default, async (request, response) => {
+router.delete("/:id", UserVerified_1.userLoggedIn, async (request, response) => {
     try {
         const qrToDelete = await qrCode_1.default.findById(request.params.id);
         if (qrToDelete) {

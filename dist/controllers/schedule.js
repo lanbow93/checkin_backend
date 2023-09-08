@@ -5,11 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const schedule_1 = __importDefault(require("../models/schedule"));
-const UserVerified_1 = __importDefault(require("../utils/UserVerified"));
+const UserVerified_1 = require("../utils/UserVerified");
 const SharedFunctions_1 = require("../utils/SharedFunctions");
 const userAccount_1 = __importDefault(require("../models/userAccount"));
 const router = express_1.default.Router();
-router.get("/", UserVerified_1.default, async (request, response) => {
+router.get("/", UserVerified_1.userLoggedIn, async (request, response) => {
     try {
         const schedule = await schedule_1.default.findOne({ user: request.query.targetUserID, group: request.query.targetGroupID });
         if (schedule) {
@@ -23,7 +23,7 @@ router.get("/", UserVerified_1.default, async (request, response) => {
         (0, SharedFunctions_1.failedRequest)(response, "Failed To Retrieve Schedule", "Unable To Get Schedule", { error });
     }
 });
-router.get("/admin", UserVerified_1.default, async (request, response) => {
+router.get("/admin", UserVerified_1.userLoggedIn, async (request, response) => {
     const userID = request.query.targetUserID || "";
     const groupID = request.query.targetGroupID || "";
     const requestorID = request.query.requestorID;
@@ -59,7 +59,7 @@ router.get("/admin", UserVerified_1.default, async (request, response) => {
         (0, SharedFunctions_1.failedRequest)(response, "Failed Schedule Search", "Unable To View Schedule", { error });
     }
 });
-router.post("/new", UserVerified_1.default, async (request, response) => {
+router.post("/new", UserVerified_1.userLoggedIn, async (request, response) => {
     const userID = request.body.userID;
     const requestorID = request.body.requestorID;
     const groupID = request.body.groupID;
@@ -97,7 +97,7 @@ router.post("/new", UserVerified_1.default, async (request, response) => {
         (0, SharedFunctions_1.failedRequest)(response, "Failed Schedule Creation", "Unable To Create Schedule", { error });
     }
 });
-router.put("/addschedule", UserVerified_1.default, async (request, response) => {
+router.put("/addschedule", UserVerified_1.userLoggedIn, async (request, response) => {
     const userID = request.body.userID;
     const requestorID = request.body.requestorID;
     const groupID = request.body.groupID;
@@ -140,7 +140,7 @@ router.put("/addschedule", UserVerified_1.default, async (request, response) => 
         (0, SharedFunctions_1.failedRequest)(response, "Failed Schedule Creation", "Unable To Create Schedule", { error });
     }
 });
-router.put("/update/:id", UserVerified_1.default, async (request, response) => {
+router.put("/update/:id", UserVerified_1.userLoggedIn, async (request, response) => {
     try {
         const oldSchedule = await schedule_1.default.findById(request.params.id);
         if (oldSchedule) {

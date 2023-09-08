@@ -10,7 +10,7 @@ import User from "../models/user";
 import { IUser, IUserAccount} from "../utils/InterfacesUsed";
 import { successfulRequest, failedRequest } from "../utils/SharedFunctions";
 import UserAccount from "../models/userAccount";
-import userLoggedIn from "../utils/UserVerified";
+import {userLoggedIn} from "../utils/UserVerified";
 import {Types} from "mongoose";
 dotenv.config()
 
