@@ -10,7 +10,6 @@ dotenv.config()
 const SECRET: string = process.env.VSECRET || ""
 
 const router: express.Router = express.Router()
-
 /* 
 Purpose: Generate a new QR Document
 Needed: groupID = Group._id QR is for | adminID = user._id
@@ -99,7 +98,6 @@ router.get("/verify", userLoggedIn, async (request: express.Request, response: e
                     sameSite: "none",
                     secure: request.hostname === "localhost" ? false : true
                 }).json({status: "Logged In", message: "Successfully Logged In", data: payload})
-                
                 // successfulRequest(response, "Successful Request", "QR Verified: Proceed To Time Punch", qrToCompare)                
             }else {
                 failedRequest(response, "Expiry Token Past 5 Minutes", "Expired Token. Generate New QR And Try Again", "Expired Token")
