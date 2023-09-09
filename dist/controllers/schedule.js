@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const schedule_1 = __importDefault(require("../models/schedule"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const userAccount_1 = __importDefault(require("../models/userAccount"));
 const UserVerified_1 = require("../utils/UserVerified");
 const SharedFunctions_1 = require("../utils/SharedFunctions");
-const userAccount_1 = __importDefault(require("../models/userAccount"));
 const router = express_1.default.Router();
 router.get("/", UserVerified_1.userLoggedIn, async (request, response) => {
     try {
