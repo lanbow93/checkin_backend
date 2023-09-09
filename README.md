@@ -2,6 +2,8 @@
 
 An easy application to check in employees at a kiosk area and validate attendance
 
+https://speedy-checkin-backend.onrender.com
+
 ##Planning
 * Technology
     * Typescript
