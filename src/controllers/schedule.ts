@@ -1,10 +1,10 @@
 import express from "express";
 import Schedule from "../models/schedule";
 import jwt from "jsonwebtoken";
+import UserAccount from "../models/userAccount";
 import { ISchedule, IScheduleQuery, IScheduleRequest, IUserAccount } from "../utils/InterfacesUsed";
 import {qrVerified, userLoggedIn} from "../utils/UserVerified";
 import { failedRequest, successfulRequest } from "../utils/SharedFunctions";
-import UserAccount from "../models/userAccount";
 
 const router: express.Router = express.Router()
 /*
@@ -170,7 +170,6 @@ router.put("/update/:id", userLoggedIn, async (request: express.Request, respons
 Purpose: Adds In Punch In Or Out
 Needed: cookie = QRToken | userID = user._id
 */
-
 router.put("/verifiedpunch", userLoggedIn, qrVerified, async(request: express.Request, response: express.Response) => {
     try {
         const cookieData: any = jwt.decode(request.cookies.QRtoken)
