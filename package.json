@@ -10,9 +10,6 @@
     "dev": "nodemon dist/server.js",
     "tsdev": "tsc --watch"
   },
-  "engines": {
-    "node": ">=14.20.1"
-  },
   "author": "Lance Bowers Jr",
   "license": "ISC",
   "devDependencies": {
