@@ -1,5 +1,6 @@
 import mongoose, { Error } from "mongoose";
-require("dotenv").config()
+import dotenv from "dotenv"
+dotenv.config()
 
 const DATABASE_URL: string = process.env.DATABASE_URL || ""
 

@@ -1,12 +1,13 @@
 import express from "express";
 import crypto from "crypto"
-require("dotenv").config();
+import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import QRCode from "../models/qrCode";
 import { IQRCode, IQRCodeObject, IUserAccount } from "../utils/InterfacesUsed";
 import {userLoggedIn} from "../utils/UserVerified";
 import { successfulRequest, failedRequest } from "../utils/SharedFunctions";
 import UserAccount from "../models/userAccount";
+dotenv.config()
 const SECRET: string = process.env.VSECRET || ""
 
 const router: express.Router = express.Router()
