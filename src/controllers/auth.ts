@@ -1,6 +1,6 @@
 import express from "express";
 import bcrypt from "bcryptjs";
-import dotenv from "dotenv";
+require("dotenv").config();
 import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
 import crypto from "crypto";
@@ -12,7 +12,7 @@ import { successfulRequest, failedRequest } from "../utils/SharedFunctions";
 import UserAccount from "../models/userAccount";
 import {userLoggedIn} from "../utils/UserVerified";
 import {Types} from "mongoose";
-dotenv.config()
+
 
 const router: express.Router = express.Router()
 const SECRET: string = process.env.SECRET || ""

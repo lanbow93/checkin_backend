@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const dotenv_1 = __importDefault(require("dotenv"));
+require("dotenv").config();
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mail_1 = __importDefault(require("@sendgrid/mail"));
 const crypto_1 = __importDefault(require("crypto"));
@@ -13,7 +13,6 @@ const user_1 = __importDefault(require("../models/user"));
 const SharedFunctions_1 = require("../utils/SharedFunctions");
 const userAccount_1 = __importDefault(require("../models/userAccount"));
 const UserVerified_1 = require("../utils/UserVerified");
-dotenv_1.default.config();
 const router = express_1.default.Router();
 const SECRET = process.env.SECRET || "";
 router.post("/signup", async (request, response) => {

@@ -5,13 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const crypto_1 = __importDefault(require("crypto"));
-const dotenv_1 = __importDefault(require("dotenv"));
+require("dotenv").config();
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const qrCode_1 = __importDefault(require("../models/qrCode"));
 const UserVerified_1 = require("../utils/UserVerified");
 const SharedFunctions_1 = require("../utils/SharedFunctions");
 const userAccount_1 = __importDefault(require("../models/userAccount"));
-dotenv_1.default.config();
 const SECRET = process.env.VSECRET || "";
 const router = express_1.default.Router();
 router.post("/new", UserVerified_1.userLoggedIn, async (request, response) => {
