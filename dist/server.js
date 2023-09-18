@@ -16,7 +16,7 @@ const schedule_1 = __importDefault(require("./controllers/schedule"));
 const userAccount_1 = __importDefault(require("./controllers/userAccount"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
-    origin: ["http://localhost:5173", "https://speedycheckin.netlify.app"],
+    origin: ["http://localhost:5173/", "https://speedycheckin.netlify.app/"],
     credentials: true
 }));
 app.use(express_1.default.json());
