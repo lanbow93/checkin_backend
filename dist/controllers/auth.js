@@ -29,7 +29,7 @@ router.post("/signup", async (request, response) => {
         };
         const badgeNameAccountCheck = await userAccount_1.default.findOne({ badgeName: request.body.badgeName });
         if (badgeNameAccountCheck) {
-            (0, SharedFunctions_1.failedRequest)(response, "Failed User Creation", "Failed To Create User. Badge Name exists.", "UserAccount Found With BadgeName");
+            (0, SharedFunctions_1.failedRequest)(response, "Failed User Creation", "Badge Name Exists In System", "UserAccount Found With BadgeName");
         }
         else {
             const user = await user_1.default.create(userObject);
@@ -76,11 +76,11 @@ router.post("/login", async (request, response) => {
                 }).json({ status: "Logged In", message: "Successfully Logged In", data: payload });
             }
             else {
-                (0, SharedFunctions_1.failedRequest)(response, "Failed Password Check", "Username/Password Is Incorrect", "Invalid Username/Password");
+                (0, SharedFunctions_1.failedRequest)(response, "Password/Username Is Incorrect", "Password/Username Is Incorrect", "Invalid Username/Password");
             }
         }
         else {
-            (0, SharedFunctions_1.failedRequest)(response, "Failed Username Check", "Username/Password Is Incorrect", "Invalid Username/Password");
+            (0, SharedFunctions_1.failedRequest)(response, "Username/Password Is Incorrect", "Username/Password Is Incorrect", "Invalid Username/Password");
         }
     }
     catch (error) {
@@ -112,14 +112,14 @@ router.put("/forgotpassword", async (request, response) => {
                     </div></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table><table class="m_row m_row-3" align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation"><tbody><tr><td><table class="m_row-content m_stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#fed149;border-radius:0;color:#000;width:600px;margin:0 auto" width="600"><tbody><tr><td class="m_column m_column-1" width="100%" style="font-weight:400;text-align:left;padding-bottom:5px;padding-top:5px;vertical-align:top;border-top:0;border-right:0;border-bottom:0;border-left:0"><table class="m_divider_block m_block-1" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation"><tbody><tr><td class="m_pad"><div class="m_alignment" align="center"><table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%"><tbody><tr><td class="m_divider_inner" style="font-size:1px;line-height:1px;border-top:1px solid #bbb"><span>&hairsp;</span></td></tr></tbody></table></div></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table>`
                 };
                 await mail_1.default.send(msg);
-                (0, SharedFunctions_1.successfulRequest)(response, "Reset Email Successful", "Password Reset Successful. Check Email For Next Steps", user);
+                (0, SharedFunctions_1.successfulRequest)(response, "Reset Email Successful", "Check Email For Next Steps", user);
             }
             catch (error) {
                 (0, SharedFunctions_1.failedRequest)(response, "Unable To Update User", "Unable To Reset Password", { error });
             }
         }
         else {
-            (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate User By Email", "No Account Found With That Email", "Failed To Reset Password");
+            (0, SharedFunctions_1.failedRequest)(response, "Unable To Locate Account", "Email Not Found", "Failed To Reset Password");
         }
     }
     catch (error) {
