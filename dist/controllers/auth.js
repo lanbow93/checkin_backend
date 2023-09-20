@@ -76,15 +76,15 @@ router.post("/login", async (request, response) => {
                 }).json({ status: "Logged In", message: "Successfully Logged In", data: payload });
             }
             else {
-                (0, SharedFunctions_1.failedRequest)(response, "Password/Username Is Incorrect", "Password/Username Is Incorrect", "Invalid Username/Password");
+                (0, SharedFunctions_1.failedRequest)(response, "Login Failed", "Invalid Password/Username", "Incorrect P/U");
             }
         }
         else {
-            (0, SharedFunctions_1.failedRequest)(response, "Username/Password Is Incorrect", "Username/Password Is Incorrect", "Invalid Username/Password");
+            (0, SharedFunctions_1.failedRequest)(response, "Login Failed", "Invalid Username/Password", "Incorrect U/P");
         }
     }
     catch (error) {
-        (0, SharedFunctions_1.failedRequest)(response, "Login Failed", "Failed To Login", { error });
+        (0, SharedFunctions_1.failedRequest)(response, "Login Failed", "Unknown", { error });
     }
 });
 router.put("/forgotpassword", async (request, response) => {

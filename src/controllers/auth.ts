@@ -89,13 +89,13 @@ router.post("/login", async(request: express.Request, response: express.Response
                     secure: request.hostname === "localhost" ? false : true
                 }).json({status: "Logged In", message: "Successfully Logged In", data: payload})
             } else {
-                failedRequest(response, "Password/Username Is Incorrect", "Password/Username Is Incorrect", "Invalid Username/Password")
+                failedRequest(response, "Login Failed", "Invalid Password/Username", "Incorrect P/U")
             }
         } else {
-            failedRequest(response, "Username/Password Is Incorrect", "Username/Password Is Incorrect", "Invalid Username/Password")
+            failedRequest(response, "Login Failed", "Invalid Username/Password", "Incorrect U/P")
         }
     } catch(error) {
-        failedRequest(response, "Login Failed", "Failed To Login", {error})
+        failedRequest(response, "Login Failed", "Unknown", {error})
     }
 })
 /*
