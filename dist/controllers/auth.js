@@ -55,7 +55,14 @@ router.post("/signup", async (request, response) => {
         }
     }
     catch (error) {
-        (0, SharedFunctions_1.failedRequest)(response, "User Creation Failed", "Signup Failed", { ...error });
+        let message = "Unknown";
+        if (error.keyPattern.username) {
+            message = "Username Already Exists";
+        }
+        if (error.keyPattern.email) {
+            message = "Username Already Exists";
+        }
+        (0, SharedFunctions_1.failedRequest)(response, "User Creation Failed", "Signup Failed", message);
     }
 });
 router.post("/login", async (request, response) => {
