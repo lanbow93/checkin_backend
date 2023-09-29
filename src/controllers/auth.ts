@@ -63,8 +63,14 @@ router.post("/signup", async (request: express.Request, response: express.Respon
             }
         }
     } catch(error: any){
-        
-        failedRequest(response,"User Creation Failed","Signup Failed", {...error} )
+        let message = "Unknown"
+        if(error.keyPattern.username){
+            message = "Username Already Exists"
+        }
+        if(error.keyPattern.email){
+            message = "Username Already Exists"
+        }
+        failedRequest(response,"User Creation Failed","Signup Failed", message )
     }
 })
 /*
