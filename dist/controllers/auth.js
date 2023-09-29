@@ -55,7 +55,7 @@ router.post("/signup", async (request, response) => {
         }
     }
     catch (error) {
-        (0, SharedFunctions_1.failedRequest)(response, "User Creation Failed", "Signup Failed", { error });
+        (0, SharedFunctions_1.failedRequest)(response, "User Creation Failed", "Signup Failed", { ...error });
     }
 });
 router.post("/login", async (request, response) => {

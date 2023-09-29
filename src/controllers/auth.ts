@@ -62,8 +62,9 @@ router.post("/signup", async (request: express.Request, response: express.Respon
                 failedRequest(response, "Failed User Creation", "Unable To Create User", {error} )
             }
         }
-    } catch(error){
-        failedRequest(response,"User Creation Failed","Signup Failed", {error} )
+    } catch(error: any){
+        
+        failedRequest(response,"User Creation Failed","Signup Failed", {...error} )
     }
 })
 /*
