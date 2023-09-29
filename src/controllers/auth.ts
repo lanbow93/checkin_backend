@@ -70,7 +70,7 @@ router.post("/signup", async (request: express.Request, response: express.Respon
         if(error.keyPattern.email){
             message = "Username Already Exists"
         }
-        failedRequest(response,"User Creation Failed","Signup Failed", message )
+        failedRequest(response,"User Creation Failed", message ,"Signup Failed" )
     }
 })
 /*
