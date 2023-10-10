@@ -71,6 +71,7 @@ router.post("/login", async (request, response) => {
         const { username, password } = request.body;
         const user = await user_1.default.findOne({ username });
         if (user) {
+            const userAccount = await userAccount_1.default.findById(user._id);
             const passwordCheck = await bcryptjs_1.default.compare(password, user.password);
             if (passwordCheck) {
                 const payload = { username };
@@ -80,7 +81,7 @@ router.post("/login", async (request, response) => {
                     path: "/",
                     sameSite: "none",
                     secure: request.hostname === "localhost" ? false : true
-                }).json({ status: "Logged In", message: "Successfully Logged In", data: payload });
+                }).json({ status: "Logged In", message: "Successfully Logged In", data: userAccount });
             }
             else {
                 (0, SharedFunctions_1.failedRequest)(response, "Login Failed", "Invalid Password/Username", "Incorrect P/U");
@@ -188,7 +189,7 @@ router.put("/emailupdate/:id", UserVerified_1.userLoggedIn, async (request, resp
             }
         }
         else {
-            (0, SharedFunctions_1.failedRequest)(response, "_ID Match Failed", "Failed To Update Email", "Email Update Failed: _ID Match");
+            (0, SharedFunctions_1.failedRequest)(response, "Failed To Update Email", "Unable To Locate Email", "Email Update Failed: _ID Match");
         }
     }
     catch (error) {

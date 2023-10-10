@@ -7,7 +7,7 @@ import crypto from "crypto";
 // Model & Type Imports
 import User from "../models/user";
 // import UserAccount from "../models/userAccount";
-import { IUser, IUserAccount} from "../utils/InterfacesUsed";
+import { IUser, IUserAccount, IUserObject} from "../utils/InterfacesUsed";
 import { successfulRequest, failedRequest } from "../utils/SharedFunctions";
 import UserAccount from "../models/userAccount";
 import {userLoggedIn} from "../utils/UserVerified";
@@ -82,9 +82,11 @@ router.post("/login", async(request: express.Request, response: express.Response
         request.body.username = request.body.username.toLowerCase()
         const {username, password} = request.body
         // Searching collection for username
-        const user: IUser | null= await User.findOne({username})
+        const user: IUserObject | null= await User.findOne({username})
+        
         // If user exists checks for password
         if (user){
+            const userAccount: IUserAccount | null= await UserAccount.findById(user._id)
             const passwordCheck: boolean = await bcrypt.compare(password, user.password)
             if(passwordCheck){
                 const payload: object = {username}
@@ -94,7 +96,7 @@ router.post("/login", async(request: express.Request, response: express.Response
                     path:"/",
                     sameSite: "none",
                     secure: request.hostname === "localhost" ? false : true
-                }).json({status: "Logged In", message: "Successfully Logged In", data: payload})
+                }).json({status: "Logged In", message: "Successfully Logged In", data: userAccount})
             } else {
                 failedRequest(response, "Login Failed", "Invalid Password/Username", "Incorrect P/U")
             }
@@ -207,7 +209,7 @@ router.put("/emailupdate/:id", userLoggedIn,  async (request: express.Request, r
                 failedRequest(response, "Incorrect Password", "Failed To Update Email: Password Incorrect", "Password Error")
             }
         } else{
-            failedRequest(response, "_ID Match Failed", "Failed To Update Email", "Email Update Failed: _ID Match")
+            failedRequest(response, "Failed To Update Email", "Unable To Locate Email", "Email Update Failed: _ID Match")
         }
     }catch(error){
         failedRequest(response, "Failed To Locate _ID", "Failed To Update Email", {error})
