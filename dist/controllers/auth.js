@@ -71,7 +71,7 @@ router.post("/login", async (request, response) => {
         const { username, password } = request.body;
         const user = await user_1.default.findOne({ username });
         if (user) {
-            const userAccount = await userAccount_1.default.findById(user._id);
+            const userAccount = await userAccount_1.default.findOne({ accountID: user._id });
             const passwordCheck = await bcryptjs_1.default.compare(password, user.password);
             if (passwordCheck) {
                 const payload = { username };

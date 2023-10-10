@@ -86,7 +86,7 @@ router.post("/login", async(request: express.Request, response: express.Response
         
         // If user exists checks for password
         if (user){
-            const userAccount: IUserAccount | null= await UserAccount.findById(user._id)
+            const userAccount: IUserAccount | null= await UserAccount.findOne({accountID: user._id})
             const passwordCheck: boolean = await bcrypt.compare(password, user.password)
             if(passwordCheck){
                 const payload: object = {username}
